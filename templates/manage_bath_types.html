@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - Manage Bath Types</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+<body>
+
+<!-- ❄️ Particle Background -->
+<div id="particles-js"></div>
+
+<!-- 🔗 Navigation Bar -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <a href="{{ url_for('home') }}" class="logo">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo" class="header-logo">
+    </a>
+    <div class="nav-links">
+      <a href="{{ url_for('admin') }}" class="btn">Appointments</a>
+      <a href="{{ url_for('manage_bath_types') }}" class="btn">Bath Types</a>
+      <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<!-- 📋 Manage Bath Types Content -->
+<div class="container">
+  <h2>🛁 Add New Bath Type</h2>
+  <form method="POST">
+    <label>Bath Type Name:</label>
+    <input type="text" name="name" required>
+
+    <label>Price (₹):</label>
+    <input type="number" name="price" step="0.01" required>
+
+    <button type="submit" class="btn">Add</button>
+  </form>
+
+  <h2>📋 Existing Bath Types</h2>
+  <ul class="card-list">
+    {% for bath in bath_types %}
+    <li class="card">
+      {{ bath.name }} - ₹{{ bath.price }}
+      <a href="{{ url_for('delete_bath_type', id=bath.id) }}" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
+    </li>
+    {% else %}
+    <li>No bath types found.</li>
+    {% endfor %}
+  </ul>
+
+  <p><a href="{{ url_for('admin') }}">⬅ Back to Admin Dashboard</a></p>
+</div>
+
+<!-- 💫 Particle Scripts -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Complete Payment - Freezehouse Berhampur</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/png">
+</head>
+<body>
+
+<!-- ❄️ Particle Background -->
+<div id="particles-js"></div>
+<div id="particles-overlay"></div>
+
+<!-- 🔗 Navigation -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <a href="{{ url_for('home') }}" class="logo">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
+    </a>
+  </div>
+</nav>
+
+<!-- 💳 Payment Container -->
+<div class="form-container">
+  <h2>Pay for Your Appointment</h2>
+  <p><strong>Bath Type:</strong> {{ appointment.bath_type }}</p>
+  <p><strong>Scheduled on:</strong> {{ appointment.date }} at {{ appointment.time }}</p>
+  <p><strong>Amount:</strong> ₹{{ appointment.price }}</p>
+
+  <button id="rzp-button" class="btn">Pay ₹{{ appointment.price }}</button>
+</div>
+
+<!-- 💫 Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  var options = {
+    "key": "{{ key_id }}",
+    "amount": "{{ appointment.price * 100|int }}",  // in paise
+    "currency": "INR",
+    "name": "Freezehouse Berhampur",
+    "description": "Ice Bath Appointment",
+    "image": "{{ url_for('static', filename='img/logo.png') }}",
+    "order_id": "{{ order_id }}",
+    "handler": function (response){
+        alert("Payment successful!");
+        window.location.href = "{{ url_for('dashboard') }}";
+    },
+    "prefill": {
+        "name": "{{ session['username'] }}",
+        "contact": "{{ appointment.phone if appointment.phone else '' }}"
+    },
+    "theme": {
+        "color": "#0C254C"
+    }
+  };
+
+  var rzp = new Razorpay(options);
+  document.getElementById('rzp-button').onclick = function(e){
+    rzp.open();
+    e.preventDefault();
+  }
+</script>
+
+<!-- ❄️ Particle Scripts -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+
+</body>
+</html>
