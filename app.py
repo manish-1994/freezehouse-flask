@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-import razorpay
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///appointments.db'
@@ -9,7 +9,6 @@ app.secret_key = 'your_secret_key_here'
 
 db = SQLAlchemy(app)
 
-razorpay_client = razorpay.Client(auth=("YOUR_KEY_ID", "YOUR_KEY_SECRET"))
 
 
 # ========== Models ==========
