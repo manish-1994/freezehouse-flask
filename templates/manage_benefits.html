@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Benefits</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+  <h2>➕ Add New Benefit</h2>
+  <form method="POST">
+    <label>Title:</label>
+    <input type="text" name="title" required>
+    
+    <label>Description:</label>
+    <textarea name="description" required></textarea>
+
+    <button type="submit" class="btn">Add Benefit</button>
+  </form>
+
+  <h2>📋 Existing Benefits</h2>
+  <ul class="card-list">
+    {% for benefit in benefits %}
+    <li class="card">
+      <strong>{{ benefit.title }}</strong><br>
+      {{ benefit.description }}<br>
+      <a href="{{ url_for('delete_benefit', id=benefit.id) }}" onclick="return confirm('Are you sure you want to delete this?')">🗑 Delete</a>
+    </li>
+    {% else %}
+    <li>No benefits added yet.</li>
+    {% endfor %}
+  </ul>
+
+  <p><a href="{{ url_for('admin') }}" class="btn">← Back to Admin</a></p>
+</div>
+
+</body>
+</html>
+
+
