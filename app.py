@@ -2,14 +2,11 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///appointments.db'
 app.secret_key = 'your_secret_key_here'
 
 db = SQLAlchemy(app)
-
-
 
 # ========== Models ==========
 class User(db.Model):
@@ -39,8 +36,6 @@ class Pricing(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     price = db.Column(db.Float, nullable=False)
-
-
 
 # ========== Routes ==========
 @app.route('/')
@@ -72,41 +67,6 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html', show_particles=True)
-
-@app.route('/admin/pricing', methods=['GET', 'POST'])
-def manage_pricing():
-    if 'username' not in session or session['username'] != 'admin':
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        title = request.form['title']
-        description = request.form['description']
-        price = float(request.form['price'])
-
-        new_item = Pricing(title=title, description=description, price=price)
-        db.session.add(new_item)
-        db.session.commit()
-        flash("Pricing item added.")
-        return redirect(url_for('manage_pricing'))
-
-    pricing_items = Pricing.query.all()
-    return render_template('manage_pricing.html', pricing_items=pricing_items, show_particles=True)
-@app.route('/admin/pricing/delete/<int:id>')
-def delete_pricing(id):
-    if 'username' not in session or session['username'] != 'admin':
-        return redirect(url_for('login'))
-
-    item = Pricing.query.get_or_404(id)
-    db.session.delete(item)
-    db.session.commit()
-    flash("Pricing item deleted.")
-    return redirect(url_for('manage_pricing'))
-
-@app.route('/pricing')
-def pricing():
-    items = Pricing.query.all()
-    return render_template('pricing.html', items=items, show_particles=True)
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -142,8 +102,6 @@ def benefits():
 @app.route('/contact')
 def contact():
     return render_template('contact.html', show_particles=True)
-
-
 
 @app.route('/logout')
 def logout():
@@ -183,34 +141,17 @@ def dashboard():
         db.session.add(appointment)
         db.session.commit()
 
-        return redirect(url_for('pay', appointment_id=appointment.id))
+        flash("Appointment booked successfully!")
+        return redirect(url_for('dashboard'))
 
     appointments = Appointment.query.filter_by(user_id=session['user_id']).all()
     return render_template('dashboard.html', appointments=appointments, bath_types=bath_types, booked_slots=booked_slots, show_particles=True)
 
+@app.route('/pricing')
+def pricing():
+    items = Pricing.query.all()
+    return render_template('pricing.html', items=items, show_particles=True)
 
-# ========== Razorpay Payment ==========
-@app.route('/pay/<int:appointment_id>')
-def pay(appointment_id):
-    if 'user_id' not in session:
-        flash("Please login to continue")
-        return redirect(url_for('login'))
-
-    appointment = Appointment.query.get_or_404(appointment_id)
-
-    order = razorpay_client.order.create(dict(
-        amount=int(appointment.price * 100),
-        currency='INR',
-        payment_capture='1'
-    ))
-
-    return render_template("payment.html",
-                           order_id=order['id'],
-                           appointment=appointment,
-                           key_id="YOUR_KEY_ID")
-
-
-# ========== Admin ==========
 @app.route('/admin')
 def admin():
     if 'username' not in session or session['username'] != 'admin':
@@ -265,6 +206,35 @@ def delete_bath_type(id):
     flash("Bath type deleted")
     return redirect(url_for('manage_bath_types'))
 
+@app.route('/admin/pricing', methods=['GET', 'POST'])
+def manage_pricing():
+    if 'username' not in session or session['username'] != 'admin':
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        description = request.form['description']
+        price = float(request.form['price'])
+
+        new_item = Pricing(title=title, description=description, price=price)
+        db.session.add(new_item)
+        db.session.commit()
+        flash("Pricing item added.")
+        return redirect(url_for('manage_pricing'))
+
+    pricing_items = Pricing.query.all()
+    return render_template('manage_pricing.html', pricing_items=pricing_items, show_particles=True)
+
+@app.route('/admin/pricing/delete/<int:id>')
+def delete_pricing(id):
+    if 'username' not in session or session['username'] != 'admin':
+        return redirect(url_for('login'))
+
+    item = Pricing.query.get_or_404(id)
+    db.session.delete(item)
+    db.session.commit()
+    flash("Pricing item deleted.")
+    return redirect(url_for('manage_pricing'))
 
 # ========== Run Server ==========
 if __name__ == '__main__':
