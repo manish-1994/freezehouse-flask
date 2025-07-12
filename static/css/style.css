@@ -196,6 +196,19 @@ a:hover {
   color: #0C254C;
 }
 
+.forgot-link {
+  font-size: 0.9em;
+  display: inline-block;
+  margin-top: 10px;
+  color: #66C4FF;
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+
 /* RESPONSIVE */
 @media (max-width: 600px) {
   .navbar-container {

@@ -1,26 +1,37 @@
-from flask import Flask, render_template, redirect, url_for, request, session, flash, jsonify
+from flask import Flask, render_template, redirect, url_for, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Mail, Message
 from datetime import datetime
 import requests
+import random
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///appointments.db'
+app.config.from_pyfile('config.py')  # contains Brevo SMTP config
 db = SQLAlchemy(app)
+mail = Mail(app)
 
-# Telegram config
+# Telegram
 BOT_TOKEN = "7598988171:AAGylvhUVZeYBIgYvOXRCsJfChjq8ohoGRs"
 ADMIN_CHAT_IDS = ["6511211034"]
 
-# ===== Models =====
+# Models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(150), unique=True, nullable=False)
     phone = db.Column(db.String(15), unique=True, nullable=False)
     aadhar = db.Column(db.String(12))
     dob = db.Column(db.String(20))
     password = db.Column(db.String(150), nullable=False)
+
+class OTPStore(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), nullable=False)
+    otp = db.Column(db.String(6), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class BathType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,15 +58,110 @@ class Benefit(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
 
-# ===== Helper: Notify Admins via Telegram =====
+# Telegram Helper
 def notify_admins(message):
     for chat_id in ADMIN_CHAT_IDS:
-        requests.post(
-            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-            data={"chat_id": chat_id, "text": message}
-        )
+        requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                      data={"chat_id": chat_id, "text": message})
 
-# ===== Routes =====
+# Forgot Password Flow
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            otp = str(random.randint(100000, 999999))
+            db.session.add(OTPStore(email=email, otp=otp))
+            db.session.commit()
+            msg = Message("Freezehouse OTP", sender=app.config['MAIL_USERNAME'], recipients=[email])
+            msg.body = f"Your OTP is: {otp}"
+            mail.send(msg)
+            session['reset_email'] = email
+            flash("OTP sent to your email.")
+            return redirect(url_for('verify_otp'))
+        flash("No account found with that email.")
+    return render_template('forgot_password.html')
+
+@app.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    if request.method == 'POST':
+        otp = request.form['otp']
+        email = session.get('reset_email')
+        record = OTPStore.query.filter_by(email=email, otp=otp).first()
+        if record:
+            db.session.delete(record)
+            db.session.commit()
+            return redirect(url_for('reset_password'))
+        flash("Invalid OTP.")
+    return render_template('verify_otp.html')
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        password = generate_password_hash(request.form['password'])
+        email = session.get('reset_email')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.password = password
+            db.session.commit()
+            session.pop('reset_email', None)
+            flash("Password reset successful.")
+            return redirect(url_for('login'))
+    return render_template('reset_password.html')
+
+# Auth
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        phone = request.form['phone']
+        aadhar = request.form['aadhar']
+        dob = request.form['dob']
+        password = generate_password_hash(request.form['password'])
+
+        if User.query.filter_by(email=email).first():
+            flash("Email is already registered.")
+            return redirect(url_for('register'))
+
+        if User.query.filter_by(username=username).first():
+            flash("Username is already taken.")
+            return redirect(url_for('register'))
+
+        if User.query.filter_by(phone=phone).first():
+            flash("Phone number is already registered.")
+            return redirect(url_for('register'))
+
+        user = User(username=username, email=email, phone=phone, aadhar=aadhar, dob=dob, password=password)
+        db.session.add(user)
+        db.session.commit()
+        flash("Registration successful.")
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, request.form['password']):
+            session['user_id'] = user.id
+            session['username'] = user.username
+            return redirect(url_for('dashboard'))
+        elif username == 'admin' and request.form['password'] == 'admin':
+            session['username'] = 'admin'
+            return redirect(url_for('admin'))
+        flash("Invalid credentials")
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
+
+# Main Pages
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -70,61 +176,17 @@ def services():
 
 @app.route('/benefits')
 def benefits():
-    benefits = Benefit.query.all()
-    return render_template('benefits.html', benefits=benefits)
+    return render_template('benefits.html', benefits=Benefit.query.all())
+
+@app.route('/pricing')
+def pricing():
+    return render_template('pricing.html', items=Pricing.query.all())
 
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
 
-@app.route('/pricing')
-def pricing():
-    items = Pricing.query.all()
-    return render_template('pricing.html', items=items)
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        phone = request.form['phone']
-        aadhar = request.form['aadhar']
-        dob = request.form['dob']
-        password = generate_password_hash(request.form['password'])
-
-        if User.query.filter((User.username == username) | (User.phone == phone)).first():
-            flash("Username or phone already registered.")
-            return redirect(url_for('register'))
-
-        user = User(username=username, phone=phone, aadhar=aadhar, dob=dob, password=password)
-        db.session.add(user)
-        db.session.commit()
-        return redirect(url_for('login'))
-
-    return render_template('register.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        if username == 'admin' and password == 'admin':
-            session['username'] = 'admin'
-            return redirect(url_for('admin'))
-
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
-            session['username'] = user.username
-            return redirect(url_for('dashboard'))
-        flash("Invalid credentials")
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('home'))
-
+# Dashboard and Appointment
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'user_id' not in session:
@@ -137,85 +199,65 @@ def dashboard():
     if request.method == 'POST':
         date = request.form['date']
         time = request.form['time']
-        bath_type_name = request.form['bath_type']
         reason = request.form['reason']
-
-        if datetime.strptime(date, "%Y-%m-%d").date() < datetime.today().date():
-            flash("Cannot book past dates.")
-            return redirect(url_for('dashboard'))
+        bath_type = request.form['bath_type']
+        bath = BathType.query.filter_by(name=bath_type).first()
+        price = bath.price if bath else 0
 
         if Appointment.query.filter_by(date=date, time=time).first():
             flash("Slot already booked.")
             return redirect(url_for('dashboard'))
 
-        bath = BathType.query.filter_by(name=bath_type_name).first()
-        price = bath.price if bath else 0
-
-        appointment = Appointment(user_id=session['user_id'], date=date, time=time,
-                                  reason=reason, bath_type=bath_type_name, price=price)
-        db.session.add(appointment)
+        appt = Appointment(user_id=session['user_id'], date=date, time=time, reason=reason, bath_type=bath_type, price=price)
+        db.session.add(appt)
         db.session.commit()
-
         user = User.query.get(session['user_id'])
-        notify_admins(f"📅 New Appointment:\n👤 {user.username}\n📞 {user.phone}\n🛁 {bath_type_name}\n🗓 {date} at {time}\n₹{price}\n📝 {reason}")
-
+        notify_admins(f"📅 New Appointment: {user.username} | {bath_type} | ₹{price} on {date} at {time}")
         return redirect(url_for('dashboard'))
 
     return render_template('dashboard.html', appointments=appointments, bath_types=bath_types, booked_slots=booked_slots)
 
 @app.route('/reschedule/<int:id>', methods=['GET', 'POST'])
 def reschedule_appointment(id):
-    appointment = Appointment.query.get_or_404(id)
-    if 'user_id' not in session or session['user_id'] != appointment.user_id:
+    appt = Appointment.query.get_or_404(id)
+    if 'user_id' not in session or session['user_id'] != appt.user_id:
         return redirect(url_for('dashboard'))
 
     bath_types = BathType.query.all()
-
     if request.method == 'POST':
-        date = request.form['date']
-        time = request.form['time']
-
-        if Appointment.query.filter(Appointment.id != id, Appointment.date == date, Appointment.time == time).first():
-            flash("Slot already booked.")
-            return redirect(url_for('reschedule_appointment', id=id))
-
-        appointment.date = date
-        appointment.time = time
-        appointment.reason = request.form['reason']
-        appointment.bath_type = request.form['bath_type']
-        bath = BathType.query.filter_by(name=appointment.bath_type).first()
-        appointment.price = bath.price if bath else 0
-
+        appt.date = request.form['date']
+        appt.time = request.form['time']
+        appt.reason = request.form['reason']
+        appt.bath_type = request.form['bath_type']
+        bath = BathType.query.filter_by(name=appt.bath_type).first()
+        appt.price = bath.price if bath else 0
         db.session.commit()
-        flash("Rescheduled successfully.")
+        notify_admins(f"🔁 Appointment Rescheduled: ID {appt.id} by user ID {appt.user_id}")
+        flash("Rescheduled.")
         return redirect(url_for('dashboard'))
 
-    return render_template('reschedule.html', appointment=appointment, bath_types=bath_types)
+    return render_template('reschedule.html', appointment=appt, bath_types=bath_types)
 
 @app.route('/delete/<int:id>')
 def delete_appointment(id):
-    appointment = Appointment.query.get_or_404(id)
-    if 'user_id' in session and appointment.user_id == session['user_id']:
-        db.session.delete(appointment)
+    appt = Appointment.query.get_or_404(id)
+    if 'user_id' in session and appt.user_id == session['user_id']:
+        db.session.delete(appt)
         db.session.commit()
     return redirect(url_for('dashboard'))
 
-# ===== Admin Routes =====
+# Admin Panel
 @app.route('/admin')
 def admin():
     if session.get('username') != 'admin':
         return redirect(url_for('login'))
-    appointments = db.session.query(Appointment, User).join(User, Appointment.user_id == User.id).order_by(Appointment.date.desc()).all()
+    appointments = db.session.query(Appointment, User).join(User).all()
     return render_template('admin.html', appointments=appointments)
 
 @app.route('/admin/delete/<int:id>')
 def admin_delete(id):
-    if session.get('username') != 'admin':
-        return redirect(url_for('login'))
-    appointment = Appointment.query.get_or_404(id)
-    db.session.delete(appointment)
+    db.session.delete(Appointment.query.get_or_404(id))
     db.session.commit()
-    flash("Appointment deleted.")
     return redirect(url_for('admin'))
 
 @app.route('/admin/bath-types', methods=['GET', 'POST'])
@@ -223,43 +265,18 @@ def manage_bath_types():
     if session.get('username') != 'admin':
         return redirect(url_for('login'))
     if request.method == 'POST':
-        name = request.form['name']
-        price = float(request.form['price'])
-        if not BathType.query.filter_by(name=name).first():
-            db.session.add(BathType(name=name, price=price))
-            db.session.commit()
-    bath_types = BathType.query.all()
-    return render_template('manage_bath_types.html', bath_types=bath_types)
-
-@app.route('/admin/bath-types/delete/<int:id>')
-def delete_bath_type(id):
-    if session.get('username') != 'admin':
-        return redirect(url_for('login'))
-    bath_type = BathType.query.get_or_404(id)
-    db.session.delete(bath_type)
-    db.session.commit()
-    return redirect(url_for('manage_bath_types'))
+        db.session.add(BathType(name=request.form['name'], price=float(request.form['price'])))
+        db.session.commit()
+    return render_template('manage_bath_types.html', bath_types=BathType.query.all())
 
 @app.route('/admin/pricing', methods=['GET', 'POST'])
 def manage_pricing():
     if session.get('username') != 'admin':
         return redirect(url_for('login'))
     if request.method == 'POST':
-        db.session.add(Pricing(title=request.form['title'],
-                               description=request.form['description'],
-                               price=float(request.form['price'])))
+        db.session.add(Pricing(title=request.form['title'], description=request.form['description'], price=float(request.form['price'])))
         db.session.commit()
-    pricing = Pricing.query.all()
-    return render_template('manage_pricing.html', pricing=pricing)
-
-@app.route('/admin/pricing/delete/<int:id>')
-def delete_pricing(id):
-    if session.get('username') != 'admin':
-        return redirect(url_for('login'))
-    item = Pricing.query.get_or_404(id)
-    db.session.delete(item)
-    db.session.commit()
-    return redirect(url_for('manage_pricing'))
+    return render_template('manage_pricing.html', pricing=Pricing.query.all())
 
 @app.route('/admin/benefits', methods=['GET', 'POST'])
 def manage_benefits():
@@ -268,19 +285,8 @@ def manage_benefits():
     if request.method == 'POST':
         db.session.add(Benefit(title=request.form['title'], description=request.form['description']))
         db.session.commit()
-    benefits = Benefit.query.all()
-    return render_template('manage_benefits.html', benefits=benefits)
+    return render_template('manage_benefits.html', benefits=Benefit.query.all())
 
-@app.route('/admin/benefits/delete/<int:id>')
-def delete_benefit(id):
-    if session.get('username') != 'admin':
-        return redirect(url_for('login'))
-    benefit = Benefit.query.get_or_404(id)
-    db.session.delete(benefit)
-    db.session.commit()
-    return redirect(url_for('manage_benefits'))
-
-# ===== WhatsApp Booking =====
 @app.route('/whatsapp-booking', methods=['GET', 'POST'])
 def whatsapp_booking():
     bath_types = BathType.query.all()
@@ -291,29 +297,21 @@ def whatsapp_booking():
         time = request.form['time']
         reason = request.form['reason']
         bath_type = request.form['bath_type']
-
-        if Appointment.query.filter_by(date=date, time=time).first():
-            return "Slot already booked."
-
         user = User.query.filter_by(phone=phone).first()
         if not user:
-            user = User(username=name, phone=phone, password=generate_password_hash('default123'))
+            user = User(username=name, phone=phone, email=f"{phone}@example.com", password=generate_password_hash('default123'))
             db.session.add(user)
             db.session.commit()
-
         bath = BathType.query.filter_by(name=bath_type).first()
         price = bath.price if bath else 0
-
-        appointment = Appointment(user_id=user.id, date=date, time=time,
-                                  reason=reason, bath_type=bath_type, price=price)
-        db.session.add(appointment)
+        appt = Appointment(user_id=user.id, date=date, time=time, reason=reason, bath_type=bath_type, price=price)
+        db.session.add(appt)
         db.session.commit()
-
-        notify_admins(f"📱 WhatsApp Booking:\n👤 {name}\n📞 {phone}\n🛁 {bath_type}\n🗓 {date} at {time}\n₹{price}\n📝 {reason}")
-        return "Appointment booked via WhatsApp. Admin notified."
+        notify_admins(f"📲 WhatsApp Booking: {name} | {bath_type} | ₹{price} on {date} at {time}")
+        return "✅ WhatsApp Booking Confirmed"
     return render_template('whatsapp_booking.html', bath_types=bath_types)
 
-# ===== Run =====
+# ===== App Runner =====
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
