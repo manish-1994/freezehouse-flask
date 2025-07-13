@@ -2,6 +2,9 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+print("Loaded MAIL_USERNAME =", os.getenv("MAIL_USERNAME"))
+
+print("CWD =", os.getcwd()) 
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')

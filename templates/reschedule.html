@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Reschedule Appointment</title>
+    <title>Reschedule Appointment | Freezehouse</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reshedule.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
 </head>
 <body class="reschedule-page">
 
@@ -11,11 +14,23 @@
 <div id="particles-js"></div>
 
 <header>
-    <img class="header-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+    <img class="header-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
     <h1>Reschedule Appointment</h1>
 </header>
 
 <div class="container form-container">
+    <h2>Update Your Ice Bath Slot</h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
     <form method="POST">
         <label for="date">Date:</label>
         <input type="date" name="date" id="date" value="{{ appointment.date }}" required>
@@ -35,10 +50,10 @@
             {% endfor %}
         </select>
 
-        <button type="submit">Update Appointment</button>
+        <button type="submit">✅ Update Appointment</button>
     </form>
 
-    <p><a href="{{ url_for('dashboard') }}">⬅ Back to Dashboard</a></p>
+    <a href="{{ url_for('dashboard') }}" class="back-link">⬅ Back to Dashboard</a>
 </div>
 
 <!-- 💫 Particle Scripts -->

@@ -9,6 +9,8 @@ from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
+print("MAIL SENDER:", app.config['MAIL_USERNAME'])
+
 
 db = SQLAlchemy(app)
 mail = Mail(app)
