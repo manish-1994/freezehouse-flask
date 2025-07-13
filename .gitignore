@@ -3,9 +3,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.db
 *.log
-instance/
 env/
 replacements.txt
 git-filter-repo.py
