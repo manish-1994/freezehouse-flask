@@ -17,7 +17,6 @@ mail = Mail(app)
 BOT_TOKEN = app.config['TELEGRAM_BOT_TOKEN']
 ADMIN_CHAT_IDS = app.config['TELEGRAM_CHAT_IDS']
 
-
 # ===========================
 # Database Models
 # ===========================
@@ -62,7 +61,6 @@ class Benefit(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
 
-
 # ===========================
 # Helper
 # ===========================
@@ -73,7 +71,6 @@ def notify_admins(message):
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
             data={"chat_id": chat_id, "text": message}
         )
-
 
 # ===========================
 # Password Reset
@@ -96,6 +93,12 @@ def forgot_password():
             return redirect(url_for('verify_otp'))
         flash("No account found with that email.")
     return render_template('forgot_password.html')
+
+@app.route('/init-db')
+def init_db():
+    db.create_all()
+    return "✅ Database initialized."
+
 
 @app.route('/verify-otp', methods=['GET', 'POST'])
 def verify_otp():
@@ -124,7 +127,6 @@ def reset_password():
             return redirect(url_for('login'))
     return render_template('reset_password.html')
 
-
 # ===========================
 # Authentication
 # ===========================
@@ -152,7 +154,6 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -168,12 +169,10 @@ def login():
         flash("Invalid credentials.")
     return render_template('login.html')
 
-
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('home'))
-
 
 # ===========================
 # Pages
@@ -202,7 +201,6 @@ def pricing():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
-
 
 # ===========================
 # Dashboard
@@ -240,7 +238,6 @@ def dashboard():
     return render_template('dashboard.html', appointments=appointments,
                            bath_types=bath_types, booked_slots=booked_slots)
 
-
 @app.route('/reschedule/<int:id>', methods=['GET', 'POST'])
 def reschedule_appointment(id):
     appt = Appointment.query.get_or_404(id)
@@ -263,7 +260,6 @@ def reschedule_appointment(id):
 
     return render_template('reschedule.html', appointment=appt, bath_types=bath_types)
 
-
 @app.route('/delete/<int:id>')
 def delete_appointment(id):
     appt = Appointment.query.get_or_404(id)
@@ -271,7 +267,6 @@ def delete_appointment(id):
         db.session.delete(appt)
         db.session.commit()
     return redirect(url_for('dashboard'))
-
 
 # ===========================
 # Admin Panel
@@ -337,7 +332,6 @@ def manage_benefits():
         db.session.commit()
     return render_template('manage_benefits.html', benefits=Benefit.query.all())
 
-
 # ===========================
 # WhatsApp Booking
 # ===========================
@@ -369,7 +363,6 @@ def whatsapp_booking():
         notify_admins(f"📲 WhatsApp Booking: {name} | {bath_type} | ₹{price} on {date} at {time}")
         return "✅ WhatsApp Booking Confirmed"
     return render_template('whatsapp_booking.html', bath_types=bath_types)
-
 
 # ===========================
 # Run App
