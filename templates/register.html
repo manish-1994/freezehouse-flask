@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register - Freezehouse Berhampur</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+<body>
+
+<!-- ❄️ Particle Background -->
+<div id="particles-js"></div>
+<div id="particles-overlay"></div>
+
+<!-- 🔗 Navigation -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <a href="{{ url_for('home') }}" class="logo">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
+    </a>
+  </div>
+</nav>
+
+<!-- 📝 Registration Form -->
+<div class="form-container">
+  <h2>Register</h2>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flash">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST">
+  <input type="text" name="username" placeholder="Username" required>
+  <input type="tel" name="phone" placeholder="Phone Number" required>
+  <label for="email">Email:</label>
+  <input type="email" name="email" required>
+  <input type="text" name="aadhar" placeholder="Aadhar Number (12 digits)" maxlength="12" required>
+  <input type="date" name="dob" placeholder="Date of Birth" required>
+  <input type="password" name="password" placeholder="Password" required>
+  <button type="submit" class="btn">Register</button>
+</form>
+
+
+  <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+</div>
+
+<!-- 🎇 Particle Scripts -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+
+</body>
+</html>

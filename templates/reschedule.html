@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reschedule Appointment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="reschedule-page">
+
+<!-- ❄️ Particle Background -->
+<div id="particles-js"></div>
+
+<header>
+    <img class="header-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+    <h1>Reschedule Appointment</h1>
+</header>
+
+<div class="container form-container">
+    <form method="POST">
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" value="{{ appointment.date }}" required>
+
+        <label for="time">Time:</label>
+        <input type="time" name="time" id="time" value="{{ appointment.time }}" required>
+
+        <label for="reason">Reason:</label>
+        <textarea name="reason" id="reason" required>{{ appointment.reason }}</textarea>
+
+        <label for="bath_type">Bath Type:</label>
+        <select name="bath_type" id="bath_type" required>
+            {% for bath in bath_types %}
+                <option value="{{ bath.name }}" {% if appointment.bath_type == bath.name %}selected{% endif %}>
+                    {{ bath.name }} - ₹{{ bath.price }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Update Appointment</button>
+    </form>
+
+    <p><a href="{{ url_for('dashboard') }}">⬅ Back to Dashboard</a></p>
+</div>
+
+<!-- 💫 Particle Scripts -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+
+</body>
+</html>

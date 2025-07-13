@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Pricing</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div id="particles-js"></div>
+
+<nav class="navbar">
+  <div class="navbar-container">
+    <a href="{{ url_for('admin') }}" class="logo"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo"></a>
+    <div class="nav-links">
+      <a href="{{ url_for('admin') }}" class="btn">Dashboard</a>
+      <a href="{{ url_for('manage_pricing') }}" class="btn">Pricing</a>
+      <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>Manage Pricing</h2>
+
+  <form method="POST">
+    <input name="title" placeholder="Title" required>
+    <textarea name="description" placeholder="Description"></textarea>
+    <input name="price" type="number" step="0.01" placeholder="Price (₹)" required>
+    <button type="submit" class="btn">Add</button>
+  </form>
+
+  <ul class="card-list">
+    {% for item in pricing_items %}
+      <li class="card">
+        <strong>{{ item.title }}</strong> - ₹{{ item.price }}<br>
+        {{ item.description }}
+        <br>
+        <a href="{{ url_for('delete_pricing', id=item.id) }}" onclick="return confirm('Delete this item?')">🗑️ Delete</a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+</body>
+</html>

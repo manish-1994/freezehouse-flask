@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact Us - Freezehouse Berhampur</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+<body>
+
+  <!-- ❄️ Particle Background -->
+  <div id="particles-js"></div>
+  <div id="particles-overlay"></div>
+
+  <!-- 🔗 Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="{{ url_for('home') }}" class="logo">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
+      </a>
+      <div class="nav-links">
+        <a href="{{ url_for('home') }}" class="btn">Home</a>
+        <a href="{{ url_for('about') }}" class="btn">About</a>
+        <a href="{{ url_for('services') }}" class="btn">Services</a>
+        <a href="{{ url_for('benefits') }}" class="btn">Benefits</a>
+        <a href="{{ url_for('contact') }}" class="btn">Contact</a>
+        <a href="{{ url_for('login') }}" class="btn">Login</a>
+        <a href="{{ url_for('register') }}" class="btn">Register</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 📬 Contact Section -->
+  <section class="container">
+    <h1>Get In Touch</h1>
+    <p>We'd love to hear from you! Book a session, ask a question, or just say hello 👋</p>
+
+    <form method="POST" action="mailto:your@email.com" enctype="text/plain">
+      <label>Name:</label>
+      <input type="text" name="name" required>
+
+      <label>Email:</label>
+      <input type="email" name="email" required>
+
+      <label>Message:</label>
+      <textarea name="message" required></textarea>
+
+      <button type="submit" class="btn">Send Message</button>
+    </form>
+
+    <h2>📍 Location</h2>
+    <p>Berhampur, Odisha — Near [Landmark or Area]</p>
+
+    <h2>📞 Call or WhatsApp</h2>
+    <p><a href="https://wa.me/91XXXXXXXXXX" target="_blank">+91 XXXXXXXXXX</a></p>
+  </section>
+
+  <!-- 🎇 Scripts -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+
+</body>
+</html>

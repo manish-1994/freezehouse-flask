@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Our Services - Freezehouse Berhampur</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+<body>
+
+  <!-- ❄️ Particle Background -->
+  <div id="particles-js"></div>
+  <div id="particles-overlay"></div>
+
+  <!-- 🔗 Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="{{ url_for('home') }}" class="logo">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
+      </a>
+      <div class="nav-links">
+        <a href="{{ url_for('home') }}" class="btn">Home</a>
+        <a href="{{ url_for('about') }}" class="btn">About</a>
+        <a href="{{ url_for('services') }}" class="btn">Services</a>
+        <a href="{{ url_for('benefits') }}" class="btn">Benefits</a>
+        <a href="{{ url_for('contact') }}" class="btn">Contact</a>
+        <a href="{{ url_for('login') }}" class="btn">Login</a>
+        <a href="{{ url_for('register') }}" class="btn">Register</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🌊 Services Section -->
+  <section class="container">
+    <h1>Our Services</h1>
+    <p>At Freezehouse Berhampur, we offer a range of cryotherapy and ice bath treatments designed to refresh your body and elevate your recovery process.</p>
+
+    <ul class="card-list">
+      <li class="card">
+        <h3>❄️ Standard Ice Bath</h3>
+        <p>Our classic 10-minute ice bath session helps reduce muscle soreness, improve circulation, and boost recovery after workouts.</p>
+      </li>
+      <li class="card">
+        <h3>⚡ Contrast Therapy</h3>
+        <p>Alternating between hot and cold immersion, contrast therapy stimulates blood flow and relieves joint pain.</p>
+      </li>
+      <li class="card">
+        <h3>🧊 Deep Recovery Bath</h3>
+        <p>Extended sessions designed for athletes and those recovering from intense physical activity or injury.</p>
+      </li>
+      <li class="card">
+        <h3>💆 Add-On: Guided Breathing</h3>
+        <p>Includes a breathing coach to guide you through breath control techniques for maximum calm and focus.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- 🎇 Particle Scripts -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+
+</body>
+</html>
