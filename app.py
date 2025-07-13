@@ -22,6 +22,7 @@ ADMIN_CHAT_IDS = app.config['TELEGRAM_CHAT_IDS']
 # ===========================
 
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(150), unique=True, nullable=False)
@@ -31,19 +32,22 @@ class User(db.Model):
     password = db.Column(db.String(150), nullable=False)
 
 class OTPStore(db.Model):
+    __tablename__ = 'otp_store'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), nullable=False)
     otp = db.Column(db.String(6), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class BathType(db.Model):
+    __tablename__ = 'bath_types'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
 
 class Appointment(db.Model):
+    __tablename__ = 'appointments'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     date = db.Column(db.String(100))
     time = db.Column(db.String(100))
     reason = db.Column(db.String(250))
@@ -51,18 +55,20 @@ class Appointment(db.Model):
     price = db.Column(db.Float)
 
 class Pricing(db.Model):
+    __tablename__ = 'pricing'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     price = db.Column(db.Float, nullable=False)
 
 class Benefit(db.Model):
+    __tablename__ = 'benefits'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
 
 # ===========================
-# Helper
+# Helpers
 # ===========================
 
 def notify_admins(message):
@@ -93,12 +99,6 @@ def forgot_password():
             return redirect(url_for('verify_otp'))
         flash("No account found with that email.")
     return render_template('forgot_password.html')
-
-@app.route('/init-db')
-def init_db():
-    db.create_all()
-    return "✅ Database initialized."
-
 
 @app.route('/verify-otp', methods=['GET', 'POST'])
 def verify_otp():
@@ -158,14 +158,14 @@ def register():
 def login():
     if request.method == 'POST':
         username = request.form['username']
+        if username == 'admin' and request.form['password'] == 'admin':
+            session['username'] = 'admin'
+            return redirect(url_for('admin'))
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, request.form['password']):
             session['user_id'] = user.id
             session['username'] = user.username
             return redirect(url_for('dashboard'))
-        elif username == 'admin' and request.form['password'] == 'admin':
-            session['username'] = 'admin'
-            return redirect(url_for('admin'))
         flash("Invalid credentials.")
     return render_template('login.html')
 
@@ -203,7 +203,7 @@ def contact():
     return render_template('contact.html')
 
 # ===========================
-# Dashboard
+# Dashboard & Booking
 # ===========================
 
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -363,6 +363,15 @@ def whatsapp_booking():
         notify_admins(f"📲 WhatsApp Booking: {name} | {bath_type} | ₹{price} on {date} at {time}")
         return "✅ WhatsApp Booking Confirmed"
     return render_template('whatsapp_booking.html', bath_types=bath_types)
+
+# ===========================
+# DB Initialization
+# ===========================
+
+@app.route('/init-db')
+def init_db():
+    db.create_all()
+    return "✅ Database initialized."
 
 # ===========================
 # Run App
