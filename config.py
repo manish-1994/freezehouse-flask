@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(dotenv_path='.env', override=True)
 print("Loaded MAIL_USERNAME =", os.getenv("MAIL_USERNAME"))
 
 print("CWD =", os.getcwd()) 
