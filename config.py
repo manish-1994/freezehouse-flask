@@ -7,7 +7,7 @@ print("Loaded MAIL_USERNAME =", os.getenv("MAIL_USERNAME"))
 print("CWD =", os.getcwd()) 
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-dev-secret')
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
