@@ -1,0 +1,25 @@
+{% extends 'admin_base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_users.css') }}">
+
+<h2>Registered Users</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Is Admin</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.phone }}</td>
+        <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

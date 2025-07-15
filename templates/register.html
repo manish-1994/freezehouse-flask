@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Register - Freezehouse Berhampur</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
 </head>
 <body>
@@ -24,30 +23,43 @@
 
 <!-- 📝 Registration Form -->
 <div class="form-container">
-  <h2>Register</h2>
+  <h2 style="text-align: center;">Create Your Freezehouse Account</h2>
+
   {% with messages = get_flashed_messages() %}
     {% if messages %}
-      <ul class="flash">
+      <div class="flash">
         {% for message in messages %}
-          <li>{{ message }}</li>
+          <p>{{ message }}</p>
         {% endfor %}
-      </ul>
+      </div>
     {% endif %}
   {% endwith %}
 
   <form method="POST">
-  <input type="text" name="username" placeholder="Username" required>
-  <input type="tel" name="phone" placeholder="Phone Number" required>
-  <label for="email">Email:</label>
-  <input type="email" name="email" required>
-  <input type="text" name="aadhar" placeholder="Aadhar Number (12 digits)" maxlength="12" required>
-  <input type="date" name="dob" placeholder="Date of Birth" required>
-  <input type="password" name="password" placeholder="Password" required>
-  <button type="submit" class="btn">Register</button>
-</form>
+    <label for="username">Full Name</label>
+    <input type="text" name="username" placeholder="Your Name" required>
 
+    <label for="email">Email Address</label>
+    <input type="email" name="email" placeholder="you@example.com" required>
 
-  <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+    <label for="phone">Phone Number</label>
+    <input type="tel" name="phone" placeholder="10-digit phone number" required>
+
+    <label for="aadhar">Aadhar Number</label>
+    <input type="text" name="aadhar" placeholder="12-digit Aadhar Number" maxlength="12" required>
+
+    <label for="dob">Date of Birth</label>
+    <input type="date" name="dob" required>
+
+    <label for="password">Password</label>
+    <input type="password" name="password" placeholder="Create a password" required>
+
+    <button type="submit" class="btn">Register</button>
+  </form>
+
+  <p style="text-align:center; margin-top: 15px;">
+    Already have an account? <a href="{{ url_for('login') }}" class="forgot-link">Login here</a>
+  </p>
 </div>
 
 <!-- 🎇 Particle Scripts -->

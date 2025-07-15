@@ -1,61 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Login - Freezehouse Berhampur</title>
+  <meta charset="UTF-8">
+  <title>Login - Freezehouse</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
 </head>
 <body>
+    <div id="particles-js"></div>
 
-<!-- ❄️ Particle Background -->
-<div id="particles-js"></div>
-<div id="particles-overlay"></div>
+  <div class="form-container">
+    <div class="logo" style="text-align:center;">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo" class="header-logo">
+    </div>
 
-<!-- 🔗 Navigation -->
-<nav class="navbar">
-  <div class="navbar-container">
-    <a href="{{ url_for('home') }}" class="logo">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
-    </a>
+    <h2 style="text-align:center;">Login to Freezehouse</h2>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      <label for="email">Email</label>
+      <input type="email" name="email" placeholder="Enter your email" required>
+
+      <label for="password">Password</label>
+      <input type="password" name="password" placeholder="Enter your password" required>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <div style="text-align:center; margin-top: 15px;">
+      <a href="{{ url_for('forgot_password') }}" class="forgot-link">Forgot Password?</a><br>
+
+      <hr>
+
+    <!-- ✅ Google Login Button -->
+<hr>
+<a href="{{ url_for('google.login') }}" class="google-login-btn">
+  <img src="{{ url_for('static', filename='img/google-logo.png') }}" alt="Google Logo" style="height: 20px; vertical-align: middle;">
+  Sign in with Google
+</a>
+
+      <a href="{{ url_for('register') }}" class="forgot-link">New user? Register here</a>
+    </div>
   </div>
-</nav>
 
-<!-- 📥 Login Form -->
-<div class="form-container">
-  <h2>Login</h2>
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="flash">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
-  
-  <form method="POST">
-  <label>Username:</label>
-  <input type="text" name="username" required>
-
-  <label>Password:</label>
-  <input type="password" name="password" required>
-
-  <button type="submit" class="btn">Login</button>
-
-  <div class="form-footer">
-    <a href="{{ url_for('forgot_password') }}" class="forgot-link">Forgot Password?</a>
-  </div>
-</form>
-  
-
-  <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
-</div>
-
-<!-- 🎇 Particle Scripts -->
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
 
 </body>
 </html>

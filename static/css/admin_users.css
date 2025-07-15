@@ -1,0 +1,79 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f9ff;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #003366;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+nav {
+    margin-top: 10px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+main {
+    padding: 2rem;
+}
+
+h2 {
+    color: #003366;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+table th, table td {
+    padding: 12px;
+    border: 1px solid #cce0f5;
+    text-align: left;
+}
+
+table th {
+    background-color: #cce0f5;
+    color: #003366;
+}
+
+table tr:nth-child(even) {
+    background-color: #f0f7ff;
+}
+
+.flash {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.flash-success {
+    background-color: #e6ffed;
+    color: #267a38;
+}
+
+.flash-danger {
+    background-color: #ffe6e6;
+    color: #cc0000;
+}

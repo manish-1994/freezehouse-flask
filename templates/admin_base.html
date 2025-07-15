@@ -1,0 +1,27 @@
+<!-- templates/admin_base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel - Freezehouse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1 style="color: aliceblue;">Admin Dashboard</h1>
+        <nav>
+            <a href="{{ url_for('admin') }}">Appointments</a> |
+            <a href="{{ url_for('admin_users') }}">Users</a> |
+            <a href="{{ url_for('manage_bath_types') }}">Bath Types</a> |
+            <a href="{{ url_for('manage_pricing') }}">Pricing</a> |
+            <a href="{{ url_for('manage_benefits') }}">Benefits</a> |
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+        <hr>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

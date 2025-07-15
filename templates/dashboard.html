@@ -74,7 +74,7 @@
 
   <!-- 🧠 JS: Disable booked slots & past dates -->
   <script>
-    const bookedSlots = {{ booked_slots | tojson }};
+    const bookedSlots = {{ booked_slots | tojson | safe }};
     const timeSelect = document.getElementById("time");
     const dateInput = document.getElementById("date");
 
