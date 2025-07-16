@@ -1,32 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Freezehouse{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}" />
 </head>
 <body>
+
+    <!-- Particle background -->
+    <div id="particles-js"></div>
+    <div id="particles-overlay"></div>
+
+    <!-- 🔗 Navigation Bar -->
     <header class="navbar">
-        <div class="container">
+        <div class="navbar-container">
             <a href="{{ url_for('home') }}" class="logo">❄️ Freezehouse</a>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('about') }}">About</a></li>
-                    <li><a href="{{ url_for('services') }}">Services</a></li>
-                    <li><a href="{{ url_for('pricing') }}">Pricing</a></li>
-                    <li><a href="{{ url_for('benefits') }}">Benefits</a></li>
-                    <li><a href="{{ url_for('contact') }}">Contact</a></li>
-                    {% if current_user.is_authenticated %}
-                        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
-                    {% else %}
-                        <li><a href="{{ url_for('login') }}">Login</a></li>
-                        <li><a href="{{ url_for('register') }}">Register</a></li>
-                    {% endif %}
-                </ul>
+            <nav class="nav-links">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('about') }}">About</a>
+                <a href="{{ url_for('services') }}">Services</a>
+                <a href="{{ url_for('pricing') }}">Pricing</a>
+                <a href="{{ url_for('benefits') }}">Benefits</a>
+                <a href="{{ url_for('contact') }}">Contact</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                {% endif %}
             </nav>
         </div>
     </header>
@@ -41,6 +45,7 @@
                 </div>
             {% endif %}
         {% endwith %}
+
         {% block content %}{% endblock %}
     </main>
 
@@ -49,5 +54,9 @@
             <p>&copy; {{ current_year or 2025 }} Freezehouse | Built with ❄️</p>
         </div>
     </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
 </body>
 </html>

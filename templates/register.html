@@ -1,27 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Register - Freezehouse Berhampur</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
-</head>
-<body>
+{% extends 'base.html' %}
 
-<!-- ❄️ Particle Background -->
-<div id="particles-js"></div>
-<div id="particles-overlay"></div>
+{% block title %}Register - Freezehouse Berhampur{% endblock %}
 
-<!-- 🔗 Navigation -->
-<nav class="navbar">
-  <div class="navbar-container">
-    <a href="{{ url_for('home') }}" class="logo">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
-    </a>
-  </div>
-</nav>
-
-<!-- 📝 Registration Form -->
+{% block content %}
 <div class="form-container">
   <h2 style="text-align: center;">Create Your Freezehouse Account</h2>
 
@@ -61,10 +42,4 @@
     Already have an account? <a href="{{ url_for('login') }}" class="forgot-link">Login here</a>
   </p>
 </div>
-
-<!-- 🎇 Particle Scripts -->
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
-
-</body>
-</html>
+{% endblock %}

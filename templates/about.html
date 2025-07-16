@@ -1,59 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>About Us - Freezehouse Berhampur</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
-  <!-- ❄️ Particle Background -->
-  <div id="particles-js"></div>
-  <div id="particles-overlay"></div>
+{% block title %}About Us - Freezehouse Berhampur{% endblock %}
 
-  <!-- 🔗 Navigation Bar -->
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a href="{{ url_for('home') }}" class="logo">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
-      </a>
-      <div class="nav-links">
-        <a href="{{ url_for('home') }}" class="btn">Home</a>
-        <a href="{{ url_for('about') }}" class="btn">About</a>
-        <a href="{{ url_for('services') }}" class="btn">Services</a>
-        <a href="{{ url_for('benefits') }}" class="btn">Benefits</a>
-        <a href="{{ url_for('contact') }}" class="btn">Contact</a>
-        <a href="{{ url_for('login') }}" class="btn">Login</a>
-        <a href="{{ url_for('register') }}" class="btn">Register</a>
-      </div>
-    </div>
-  </nav>
+{% block content %}
+<section class="container">
+  <h1>About Freezehouse Berhampur</h1>
+  <p>Founded with the vision to bring modern recovery science to Odisha, Freezehouse Berhampur is a pioneer in cryotherapy and ice bath services. We are committed to helping individuals achieve physical and mental resilience through the power of cold immersion therapy.</p>
 
-  <!-- 🧊 About Section -->
-  <section class="container">
-    <h1>About Freezehouse Berhampur</h1>
-    <p>Founded with the vision to bring modern recovery science to Odisha, Freezehouse Berhampur is a pioneer in cryotherapy and ice bath services. We are committed to helping individuals achieve physical and mental resilience through the power of cold immersion therapy.</p>
+  <h2>🌟 Our Mission</h2>
+  <p>To promote wellness and recovery by offering safe, accessible, and effective ice bath experiences that help our clients rejuvenate, recover, and reset.</p>
 
-    <h2>🌟 Our Mission</h2>
-    <p>To promote wellness and recovery by offering safe, accessible, and effective ice bath experiences that help our clients rejuvenate, recover, and reset.</p>
+  <h2>👥 Who We Serve</h2>
+  <ul class="card-list">
+    <li class="card">Athletes and fitness enthusiasts</li>
+    <li class="card">Working professionals with stress or fatigue</li>
+    <li class="card">Individuals managing pain, inflammation, or injury</li>
+    <li class="card">Anyone seeking a physical and mental energy boost</li>
+  </ul>
 
-    <h2>👥 Who We Serve</h2>
-    <ul class="card-list">
-      <li class="card">Athletes and fitness enthusiasts</li>
-      <li class="card">Working professionals with stress or fatigue</li>
-      <li class="card">Individuals managing pain, inflammation, or injury</li>
-      <li class="card">Anyone seeking a physical and mental energy boost</li>
-    </ul>
-
-    <h2>📍 Visit Us</h2>
-    <p>We're based in the heart of Berhampur with a modern, relaxing space to welcome you. Come chill with us — literally!</p>
-  </section>
-
-  <!-- 🎇 Particle Scripts -->
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
-
-</body>
-</html>
+  <h2>📍 Visit Us</h2>
+  <p>We're based in the heart of Berhampur with a modern, relaxing space to welcome you. Come chill with us — literally!</p>
+</section>
+{% endblock %}

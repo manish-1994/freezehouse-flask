@@ -1,54 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Admin Panel - Freezehouse</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
-</head>
-<body>
+{% extends 'admin_base.html' %}
 
-<!-- ❄️ Particle Background -->
-<div id="particles-js"></div>
-
-<!-- 🔗 Navigation Bar -->
-<nav class="navbar">
-  <div class="navbar-container">
-    <a href="{{ url_for('home') }}" class="logo">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" />
-    </a>
-    <div class="nav-links">
-      <a href="{{ url_for('admin') }}" class="btn">📋 Appointments</a>
-      <a href="{{ url_for('manage_bath_types') }}" class="btn">🛁 Bath Types</a>
-      <a href="{{ url_for('manage_pricing') }}" class="btn">💰 Pricing</a>
-      <a href="{{ url_for('admin_users') }}" class="btn btn-primary mt-3">View All Users</a>
-      <a href="{{ url_for('logout') }}" class="btn">🚪 Logout</a>
-    </div>
-  </div>
-</nav>
-
-<!-- 📋 Appointment List -->
-<div class="container">
-  <h2>All Appointments (Including WhatsApp)</h2>
-  <ul class="card-list">
-    {% for appointment, user in appointments %}
+{% block content %}
+<h2>All Appointments (Including WhatsApp)</h2>
+<ul class="card-list">
+  {% for appointment, user in appointments %}
     <li class="card">
       <strong>📅 {{ appointment.date }} at {{ appointment.time }}</strong><br>
       <strong>👤 User:</strong> {{ user.username }}<br>
-      <strong>📞 Phone:</strong> {{ user.phone }}<br>
+      <strong>📞 Phone:</strong> {{ user.phone or 'N/A' }}<br>
+      <strong>📧 Email:</strong> {{ user.email or 'N/A' }}<br>
       <strong>🛁 Bath Type:</strong> {{ appointment.bath_type }} - ₹{{ appointment.price }}<br>
       <strong>📝 Reason:</strong> {{ appointment.reason }}<br>
-      <a href="{{ url_for('admin_delete', id=appointment.id) }}" onclick="return confirm('Are you sure you want to delete this appointment?')">🗑 Delete</a>
+      <a href="{{ url_for('admin_delete', id=appointment.id) }}" class="btn" onclick="return confirm('Are you sure you want to delete this appointment?')">🗑 Delete</a>
     </li>
-    {% else %}
-    <li>No appointments found.</li>
-    {% endfor %}
-  </ul>
-</div>
-
-<!-- 💫 Particle JS -->
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
-
-</body>
-</html>
+  {% else %}
+    <li class="card">No appointments found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

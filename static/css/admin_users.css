@@ -1,8 +1,11 @@
+/* admin_users.css */
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f9ff;
     margin: 0;
     padding: 0;
+    color: #0C254C;
 }
 
 header {
@@ -33,39 +36,53 @@ nav a:hover {
 
 main {
     padding: 2rem;
+    color: #0C254C;
+    background-color: #f4f9ff;
 }
 
 h2 {
     color: #003366;
     margin-bottom: 20px;
+    font-size: 1.8rem;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
 }
 
-table th, table td {
-    padding: 12px;
+table th,
+table td {
+    padding: 14px 16px;
     border: 1px solid #cce0f5;
     text-align: left;
+    font-size: 0.95rem;
+    color: #0C254C; /* ✅ Ensures readability */
 }
 
 table th {
     background-color: #cce0f5;
     color: #003366;
+    font-weight: 600;
 }
 
 table tr:nth-child(even) {
     background-color: #f0f7ff;
 }
 
+table tr:hover {
+    background-color: #e6f2ff;
+}
+
 .flash {
     padding: 1rem;
     margin-bottom: 1rem;
     border-radius: 4px;
+    font-weight: bold;
 }
 
 .flash-success {
@@ -76,4 +93,28 @@ table tr:nth-child(even) {
 .flash-danger {
     background-color: #ffe6e6;
     color: #cc0000;
+}
+
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    table tr {
+        margin-bottom: 1rem;
+    }
+
+    table td {
+        padding-left: 50%;
+        position: relative;
+    }
+
+    table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 16px;
+        top: 12px;
+        font-weight: bold;
+        color: #003366;
+    }
 }

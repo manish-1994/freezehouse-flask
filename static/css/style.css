@@ -14,6 +14,8 @@ body {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  z-index: 1;
 }
 
 /* NAVBAR */
@@ -33,15 +35,23 @@ body {
   flex-wrap: wrap;
 }
 
+.logo {
+  color: white;
+  font-weight: 600;
+  font-size: 1.4rem;
+  text-decoration: none;
+}
+
 .nav-links {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  align-items: center;
 }
 
-.nav-links a.btn {
-  padding: 10px 18px;
-  border-radius: 8px;
+.nav-links a {
+  padding: 10px 16px;
+  border-radius: 6px;
   background-color: #66C4FF;
   color: #0C254C;
   text-decoration: none;
@@ -49,17 +59,9 @@ body {
   transition: all 0.3s ease;
 }
 
-.nav-links a.btn:hover {
+.nav-links a:hover {
   background-color: #1E3A5F;
   color: white;
-}
-
-/* LOGO */
-.logo img,
-.header-logo {
-  height: 48px;
-  width: auto;
-  object-fit: contain;
 }
 
 /* HERO */
@@ -69,6 +71,8 @@ body {
   align-items: center;
   padding: 80px 20px 40px;
   text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
 .hero h1 {
@@ -92,6 +96,8 @@ body {
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(14, 50, 80, 0.1);
+  position: relative;
+  z-index: 2;
 }
 
 /* FORM */
@@ -136,13 +142,46 @@ ul.card-list {
 }
 
 li.card {
-  background-color: #fff;
+  background-color: #ffffff;
+  color: #0C254C; /* ensures dark readable text */
   padding: 15px;
   margin: 10px 0;
   border-left: 5px solid #66C4FF;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(14, 50, 80, 0.1);
 }
+
+.card a {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 12px;
+  background-color: #ff4d4d;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.card a:hover {
+  background-color: #cc0000;
+}
+@media (max-width: 600px) {
+  .card {
+    padding: 16px;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .card p {
+    font-size: 0.9rem;
+  }
+}
+
+
+
 
 /* FLASH */
 .flash {
@@ -153,15 +192,25 @@ li.card {
   margin-bottom: 15px;
 }
 
-/* PARTICLES */
+/* PARTICLES BACKGROUND */
 #particles-js {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
+  z-index: -2;
   background-color: #f0f8ff;
+}
+
+#particles-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* FOOTER */
@@ -170,6 +219,7 @@ li.card {
   padding: 20px;
   font-size: 0.9rem;
   color: #0C254C;
+  background-color: #E4F0FA;
 }
 
 /* LINKS */
@@ -193,8 +243,26 @@ a:hover {
   text-decoration: underline;
 }
 
-/* RESPONSIVE */
+/* RESPONSIVE NAVBAR + MOBILE */
 @media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .nav-links a {
+    display: block;
+    width: 100%;
+  }
+
   .hero h1 {
     font-size: 2rem;
   }
@@ -203,23 +271,8 @@ a:hover {
     font-size: 1rem;
   }
 
-  .navbar-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .nav-links {
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .logo img {
-    height: 40px;
-  }
-
   .container,
   .form-container {
-    margin: 20px auto;
     padding: 20px;
   }
 
@@ -227,4 +280,80 @@ a:hover {
     width: 100%;
     text-align: center;
   }
+}
+.google-login-btn {
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  color: #444;
+  font-weight: 500;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+.google-login-btn:hover {
+  background-color: #f1f1f1;
+}
+.header-logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+}
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.form-group.full-width {
+  flex-basis: 100%;
+}
+
+.card-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+/* Ensure all general text and headings inside containers are visible */
+.container, .container * {
+  color: #1a1a1a !important; /* dark readable text */
+}
+
+/* Specifically target labels and headings */
+label, h2, h3, p {
+  color: #1a1a1a !important;
+}
+
+/* Inside white card-like elements, ensure text is dark */
+.card {
+  background-color: #fff;
+  color: #1a1a1a;
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+/* Optional: if you use form-control class or similar */
+input, select, textarea {
+  color: #1a1a1a;
+  background-color: #f9f9f9;
+}
+.container label,
+.container h2,
+.container h3,
+.container p,
+.container li,
+.card {
+  color: #1a1a1a !important;
 }

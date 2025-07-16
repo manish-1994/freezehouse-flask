@@ -10,6 +10,8 @@ import requests
 import random
 import os
 from config import Config
+import logging
+
 
 # Allow OAuth over HTTP (for development only!)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -100,7 +102,19 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # ========== Helpers ==========
-def notify_admins(message):
+def notify_admin(message):
+    token = os.getenv('TELEGRAM_BOT_TOKEN')
+    chat_ids = os.getenv('TELEGRAM_CHAT_IDS').split(',')
+    for chat_id in chat_ids:
+        try:
+            res = requests.post(
+                f"https://api.telegram.org/bot{token}/sendMessage",
+                data={"chat_id": chat_id.strip(), "text": message},
+                timeout=5
+            )
+            logging.info(f"✅ Telegram sent to {chat_id} | Status: {res.status_code}")
+        except Exception as e:
+            logging.error(f"❌ Telegram failed for {chat_id}: {e}")
     for chat_id in ADMIN_CHAT_IDS:
         requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", data={"chat_id": chat_id, "text": message})
 
@@ -446,28 +460,71 @@ def delete_bath_type(id):
 def manage_pricing():
     if not current_user.is_admin:
         return redirect(url_for('login'))
+
     if request.method == 'POST':
-        db.session.add(Pricing(
-            title=request.form['title'],
-            description=request.form['description'],
-            price=float(request.form['price'])
-        ))
+        title = request.form['title']
+        description = request.form['description']
+        price = float(request.form['price'])
+        db.session.add(Pricing(title=title, description=description, price=price))
         db.session.commit()
-    return render_template('manage_pricing.html', pricing=Pricing.query.all())
+        flash("✅ Pricing item added successfully!", "success")
+        return redirect(url_for('manage_pricing'))
+
+    pricing_items = Pricing.query.all()
+    return render_template('manage_pricing.html', pricing_items=pricing_items)
+
+@app.route('/admin/pricing/delete/<int:id>', methods=['GET'])
+@login_required
+def delete_pricing(id):
+    if not current_user.is_admin:
+        flash("Access denied", "danger")
+        return redirect(url_for('admin'))
+
+    item = Pricing.query.get_or_404(id)
+    db.session.delete(item)
+    db.session.commit()
+    flash("✅ Pricing item deleted.", "success")
+    return redirect(url_for('manage_pricing'))
+
+
 
 # ========== Benefit Management ==========
 @app.route('/admin/benefits', methods=['GET', 'POST'])
 @login_required
 def manage_benefits():
     if not current_user.is_admin:
-        return redirect(url_for('login'))
+        flash("Admin access only.", "warning")
+        return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
-        db.session.add(Benefit(
-            title=request.form['title'],
-            description=request.form['description']
-        ))
-        db.session.commit()
-    return render_template('manage_benefits.html', benefits=Benefit.query.all())
+        title = request.form['title']
+        description = request.form['description']
+        
+        if title and description:
+            new_benefit = Benefit(title=title, description=description)
+            db.session.add(new_benefit)
+            db.session.commit()
+            flash("✅ Benefit added successfully!", "success")
+        else:
+            flash("❌ Both title and description are required.", "danger")
+
+        return redirect(url_for('manage_benefits'))
+
+    benefits = Benefit.query.all()
+    return render_template('manage_benefits.html', benefits=benefits)
+
+@app.route('/admin/benefits/delete/<int:id>', methods=['GET'])
+@login_required
+def delete_benefit(id):
+    if not current_user.is_admin:
+        flash("Admin access only.", "warning")
+        return redirect(url_for('dashboard'))
+
+    benefit = Benefit.query.get_or_404(id)
+    db.session.delete(benefit)
+    db.session.commit()
+    flash("✅ Benefit deleted successfully.", "success")
+    return redirect(url_for('manage_benefits'))
 
 # ========== Utility ==========
 @app.route('/init-db')

@@ -1,23 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Reschedule Appointment | Freezehouse</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/reshedule.css') }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-</head>
-<body class="reschedule-page">
+{% extends 'base.html' %}
 
-<!-- ❄️ Particle Background -->
-<div id="particles-js"></div>
+{% block title %}Reschedule Appointment | Freezehouse{% endblock %}
 
-<header>
-    <img class="header-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
-    <h1>Reschedule Appointment</h1>
-</header>
-
+{% block content %}
 <div class="container form-container">
     <h2>Update Your Ice Bath Slot</h2>
 
@@ -50,15 +35,11 @@
             {% endfor %}
         </select>
 
-        <button type="submit">✅ Update Appointment</button>
+        <button type="submit" class="btn">✅ Update Appointment</button>
     </form>
 
-    <a href="{{ url_for('dashboard') }}" class="back-link">⬅ Back to Dashboard</a>
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('dashboard') }}" class="back-link">⬅ Back to Dashboard</a>
+    </div>
 </div>
-
-<!-- 💫 Particle Scripts -->
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
-
-</body>
-</html>
+{% endblock %}

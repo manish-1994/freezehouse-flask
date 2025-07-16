@@ -1,54 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Login - Freezehouse</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div id="particles-js"></div>
+{% extends 'base.html' %}
 
-  <div class="form-container">
-    <div class="logo" style="text-align:center;">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo" class="header-logo">
-    </div>
+{% block title %}Login - Freezehouse{% endblock %}
 
-    <h2 style="text-align:center;">Login to Freezehouse</h2>
-
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash">{{ messages[0] }}</div>
-      {% endif %}
-    {% endwith %}
-
-    <form method="POST">
-      <label for="email">Email</label>
-      <input type="email" name="email" placeholder="Enter your email" required>
-
-      <label for="password">Password</label>
-      <input type="password" name="password" placeholder="Enter your password" required>
-
-      <button type="submit">Login</button>
-    </form>
-
-    <div style="text-align:center; margin-top: 15px;">
-      <a href="{{ url_for('forgot_password') }}" class="forgot-link">Forgot Password?</a><br>
-
-      <hr>
-
-    <!-- ✅ Google Login Button -->
-<hr>
-<a href="{{ url_for('google.login') }}" class="google-login-btn">
-  <img src="{{ url_for('static', filename='img/google-logo.png') }}" alt="Google Logo" style="height: 20px; vertical-align: middle;">
-  Sign in with Google
+{% block content %}
+<div class="form-container">
+  <div class="logo" style="text-align:center;">
+<a href="{{ url_for('home') }}">
+  <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo" class="header-logo small-logo">
 </a>
-
-      <a href="{{ url_for('register') }}" class="forgot-link">New user? Register here</a>
-    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+  <h2 style="text-align:center;">Login to Freezehouse</h2>
 
-</body>
-</html>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash">{{ messages[0] }}</div>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST">
+    <label for="email">Email</label>
+    <input type="email" name="email" placeholder="Enter your email" required>
+
+    <label for="password">Password</label>
+    <input type="password" name="password" placeholder="Enter your password" required>
+
+    <button type="submit" class="btn">Login</button>
+  </form>
+
+  <div style="text-align:center; margin-top: 15px;">
+    <a href="{{ url_for('forgot_password') }}" class="forgot-link">Forgot Password?</a>
+    
+    <hr>
+
+    <!-- ✅ Google Login -->
+    <a href="{{ url_for('google.login') }}" class="google-login-btn btn" style="display:inline-flex; align-items:center; gap:10px;">
+      <img src="{{ url_for('static', filename='img/google-logo.png') }}" alt="Google Logo" style="height: 20px;">
+      Sign in with Google
+    </a>
+
+    <br><br>
+    <a href="{{ url_for('register') }}" class="forgot-link">New user? Register here</a>
+  </div>
+</div>
+{% endblock %}

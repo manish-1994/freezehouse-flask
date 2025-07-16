@@ -1,25 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Pricing - Freezehouse Berhampur</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+{% extends 'base.html' %}
 
-<div id="particles-js"></div>
+{% block title %}Pricing - Freezehouse Berhampur{% endblock %}
 
-<nav class="navbar">
-  <div class="navbar-container">
-    <a href="{{ url_for('home') }}" class="logo"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo"></a>
-    <div class="nav-links">
-      <a href="{{ url_for('home') }}" class="btn">Home</a>
-      <a href="{{ url_for('services') }}" class="btn">Services</a>
-      <a href="{{ url_for('pricing') }}" class="btn">Pricing</a>
-      <a href="{{ url_for('contact') }}" class="btn">Contact</a>
-    </div>
-  </div>
-</nav>
-
+{% block content %}
 <div class="container">
   <h2>🧊 Pricing for Ice Bath Services</h2>
 
@@ -29,11 +12,9 @@
         <strong>{{ item.title }}</strong> - ₹{{ item.price }}<br>
         {{ item.description }}
       </li>
+    {% else %}
+      <li>No pricing entries available.</li>
     {% endfor %}
   </ul>
 </div>
-
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
-</body>
-</html>
+{% endblock %}

@@ -5,21 +5,25 @@
 
 <h2>Registered Users</h2>
 <table>
-    <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Is Admin</th>
-    </tr>
-    {% for user in users %}
-    <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.username }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.phone }}</td>
-        <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Is Admin</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td data-label="ID">{{ user.id }}</td>
+            <td data-label="Username">{{ user.username }}</td>
+            <td data-label="Email">{{ user.email }}</td>
+            <td data-label="Phone">{{ user.phone }}</td>
+            <td data-label="Is Admin">{{ 'Yes' if user.is_admin else 'No' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}

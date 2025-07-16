@@ -1,104 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}" type="image/png">
-</head>
-<body>
+{% extends 'base.html' %}
 
-  <!-- ❄️ Particle Background -->
-  <div id="particles-js"></div>
+{% block title %}Dashboard - Freezehouse{% endblock %}
 
-  <!-- 🔗 Header with Logo -->
-  <header class="navbar">
-    <div class="navbar-container">
-      <a href="{{ url_for('home') }}">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="header-logo">
-      </a>
-      <h1 style="color: white;">Welcome, {{ session['username'] }}</h1>
-    </div>
-  </header>
+{% block content %}
+<div class="container">
+  <h2>Welcome, {{ current_user.username }}</h2>
 
-  <div class="container">
-    <h2>Book Appointment</h2>
-    <form method="POST" id="booking-form">
-      <label>Date:</label>
-      <input type="date" name="date" id="date" min="" required>
+  <h3>Book Appointment</h3>
+  <form method="POST" id="booking-form">
+    <label for="date">Date:</label>
+    <input type="date" name="date" id="date" required>
 
-      <label>Time:</label>
-      <select name="time" id="time" required>
-        <option value="">Select a Time</option>
-        {% for hour in range(9, 22) %}
-          {% set hour12 = hour if hour <= 12 else hour - 12 %}
-          {% set suffix = "AM" if hour < 12 else "PM" %}
-          {% set time_val = "%02d:00"|format(hour) %}
-          <option value="{{ time_val }}">{{ "%02d:00"|format(hour12) }} {{ suffix }}</option>
-        {% endfor %}
-      </select>
-
-      <label>Reason:</label>
-      <textarea name="reason" placeholder="Reason" required></textarea>
-
-      <label>Bath Type:</label>
-      <select name="bath_type" required>
-        {% for bath in bath_types %}
-          <option value="{{ bath.name }}">{{ bath.name }} - ₹{{ bath.price }}</option>
-        {% endfor %}
-      </select>
-
-      <button type="submit" class="btn">Book</button>
-    </form>
-
-    <h2>Your Appointments</h2>
-    <ul class="card-list">
-      {% for appointment in appointments %}
-      <li class="card">
-        <strong>{{ appointment.date }} at {{ appointment.time }}</strong><br>
-        {{ appointment.reason }} | {{ appointment.bath_type }} | ₹{{ appointment.price }}<br>
-        <a href="{{ url_for('reschedule_appointment', id=appointment.id) }}">✏️ Reschedule</a>
-        <a href="{{ url_for('delete_appointment', id=appointment.id) }}" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
-      </li>
-      {% else %}
-      <li>No appointments yet.</li>
+    <label for="time">Time:</label>
+    <select name="time" id="time" required>
+      <option value="">Select a Time</option>
+      {% for hour in range(9, 22) %}
+        {% set hour12 = hour if hour <= 12 else hour - 12 %}
+        {% set suffix = "AM" if hour < 12 else "PM" %}
+        {% set time_val = "%02d:00"|format(hour) %}
+        <option value="{{ time_val }}">{{ "%02d:00"|format(hour12) }} {{ suffix }}</option>
       {% endfor %}
-    </ul>
+    </select>
 
-    <p><a href="{{ url_for('logout') }}">Logout</a></p>
-  </div>
+    <label for="reason">Reason:</label>
+    <textarea name="reason" id="reason" placeholder="Reason" required></textarea>
 
-  <!-- 🌌 Particle JS -->
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+    <label for="bath_type">Bath Type:</label>
+    <select name="bath_type" id="bath_type" required>
+      {% for bath in bath_types %}
+        <option value="{{ bath.name }}">{{ bath.name }} - ₹{{ bath.price }}</option>
+      {% endfor %}
+    </select>
 
-  <!-- 🧠 JS: Disable booked slots & past dates -->
-  <script>
-    const bookedSlots = {{ booked_slots | tojson | safe }};
-    const timeSelect = document.getElementById("time");
-    const dateInput = document.getElementById("date");
+    <button type="submit" class="btn">Book</button>
+  </form>
 
-    dateInput.addEventListener("change", function () {
-      const selectedDate = this.value;
-      const takenTimes = bookedSlots
-        .filter(slot => slot[0] === selectedDate)
-        .map(slot => slot[1]);
+  <h3>Your Appointments</h3>
+  <ul class="card-list">
+    {% for appointment in appointments %}
+    <li class="card">
+      <strong>{{ appointment.date }} at {{ appointment.time }}</strong><br>
+      {{ appointment.reason }} | {{ appointment.bath_type }} | ₹{{ appointment.price }}<br>
+      <a href="{{ url_for('reschedule_appointment', id=appointment.id) }}">✏️ Reschedule</a>
+      &nbsp; | &nbsp;
+      <a href="{{ url_for('delete_appointment', id=appointment.id) }}" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
+    </li>
+    {% else %}
+    <li>No appointments yet.</li>
+    {% endfor %}
+  </ul>
 
-      [...timeSelect.options].forEach(opt => {
-        if (opt.value && takenTimes.includes(opt.value)) {
-          opt.disabled = true;
-          opt.textContent = opt.value + " (Booked)";
-        } else {
-          opt.disabled = false;
-          opt.textContent = opt.textContent.replace(" (Booked)", "");
-        }
-      });
+  <p><a href="{{ url_for('logout') }}" class="btn" style="margin-top: 20px; display: inline-block;">Logout</a></p>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+
+<script>
+  const bookedSlots = {{ booked_slots | tojson | safe }};
+  const timeSelect = document.getElementById("time");
+  const dateInput = document.getElementById("date");
+
+  dateInput.addEventListener("change", function () {
+    const selectedDate = this.value;
+    const takenTimes = bookedSlots
+      .filter(slot => slot[0] === selectedDate)
+      .map(slot => slot[1]);
+
+    [...timeSelect.options].forEach(opt => {
+      if (opt.value && takenTimes.includes(opt.value)) {
+        opt.disabled = true;
+        opt.textContent = opt.value + " (Booked)";
+      } else {
+        opt.disabled = false;
+        opt.textContent = opt.textContent.replace(" (Booked)", "");
+      }
     });
+  });
 
-    // ⛔ Block past dates
-    const today = new Date().toISOString().split('T')[0];
-    dateInput.setAttribute('min', today);
-  </script>
-
-</body>
-</html>
+  // Block past dates
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.setAttribute('min', today);
+</script>
+{% endblock %}

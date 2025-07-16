@@ -1,66 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Benefits of Ice Baths - Freezehouse Berhampur</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
-</head>
-<body>
+<!-- templates/benefits.html -->
+{% extends 'base.html' %}
 
-  <!-- ❄️ Particle Background -->
-  <div id="particles-js"></div>
-  <div id="particles-overlay"></div>
+{% block title %}Benefits - Freezehouse{% endblock %}
 
-  <!-- 🔗 Navbar -->
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a href="{{ url_for('home') }}" class="logo">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo">
-      </a>
-      <div class="nav-links">
-        <a href="{{ url_for('home') }}" class="btn">Home</a>
-        <a href="{{ url_for('about') }}" class="btn">About</a>
-        <a href="{{ url_for('services') }}" class="btn">Services</a>
-        <a href="{{ url_for('benefits') }}" class="btn">Benefits</a>
-        <a href="{{ url_for('contact') }}" class="btn">Contact</a>
-        <a href="{{ url_for('login') }}" class="btn">Login</a>
-        <a href="{{ url_for('register') }}" class="btn">Register</a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ❄️ Benefits Section -->
-  <section class="container">
-    <h1>Benefits of Ice Bath Therapy</h1>
-    <ul class="card-list">
-      <li class="card">
-        <h3>🦵 Reduces Muscle Soreness</h3>
-        <p>Cold exposure reduces inflammation and relieves sore muscles post workout or intense activity.</p>
-      </li>
-      <li class="card">
-        <h3>💪 Accelerates Recovery</h3>
-        <p>Ice baths help your body bounce back faster after physical exertion by increasing blood flow and nutrient delivery.</p>
-      </li>
-      <li class="card">
-        <h3>🧠 Enhances Mental Clarity</h3>
-        <p>Cold therapy can elevate mood, improve alertness, and boost resilience to stress.</p>
-      </li>
-      <li class="card">
-        <h3>💤 Improves Sleep</h3>
-        <p>Lowering your body temperature before sleep may help you relax and fall asleep faster.</p>
-      </li>
-      <li class="card">
-        <h3>🔥 Boosts Immunity</h3>
-        <p>Regular exposure to cold is linked with increased white blood cell count and immunity support.</p>
-      </li>
-    </ul>
-  </section>
-
-  <!-- 🎇 Scripts -->
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
-
-</body>
-</html>
+{% block content %}
+  <h1 class="section-heading">Benefits of Ice Bath Therapy</h1>
+  <ul class="card-list">
+    <li class="card">
+      <h3>🦵 Reduces Muscle Soreness</h3>
+      <p>Cold exposure reduces inflammation and relieves sore muscles post workout or intense activity.</p>
+    </li>
+    <li class="card">
+      <h3>💪 Accelerates Recovery</h3>
+      <p>Ice baths help your body bounce back faster after physical exertion by increasing blood flow and nutrient delivery.</p>
+    </li>
+    <li class="card">
+      <h3>🧠 Enhances Mental Clarity</h3>
+      <p>Cold therapy can elevate mood, improve alertness, and boost resilience to stress.</p>
+    </li>
+    <li class="card">
+      <h3>💤 Improves Sleep</h3>
+      <p>Lowering your body temperature before sleep may help you relax and fall asleep faster.</p>
+    </li>
+    <li class="card">
+      <h3>🔥 Boosts Immunity</h3>
+      <p>Regular exposure to cold is linked with increased white blood cell count and immunity support.</p>
+    </li>
+  </ul>
+{% endblock %}

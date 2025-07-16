@@ -96,3 +96,29 @@
             color: red;
             font-weight: bold;
         }
+
+        .back-btn {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: #003366;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.back-btn:hover {
+    background-color: #00509e;
+}
+.back-link {
+    display: inline-block;
+    background-color: #003366;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    background-color: #00509e;
+}
