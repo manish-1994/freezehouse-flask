@@ -9,54 +9,72 @@
 </head>
 <body>
 
-    <!-- Particle background -->
-    <div id="particles-js"></div>
-    <div id="particles-overlay"></div>
+<!-- ❄️ Particle Background -->
+<div id="particles-js"></div>
+<div id="particles-overlay"></div>
 
-    <!-- 🔗 Navigation Bar -->
-    <header class="navbar">
-        <div class="navbar-container">
-            <a href="{{ url_for('home') }}" class="logo">❄️ Freezehouse</a>
-            <nav class="nav-links">
-                <a href="{{ url_for('home') }}">Home</a>
-                <a href="{{ url_for('about') }}">About</a>
-                <a href="{{ url_for('services') }}">Services</a>
-                <a href="{{ url_for('pricing') }}">Pricing</a>
-                <a href="{{ url_for('benefits') }}">Benefits</a>
-                <a href="{{ url_for('contact') }}">Contact</a>
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                    <a href="{{ url_for('logout') }}">Logout</a>
-                {% else %}
-                    <a href="{{ url_for('login') }}">Login</a>
-                    <a href="{{ url_for('register') }}">Register</a>
-                {% endif %}
-            </nav>
-        </div>
-    </header>
+<!-- 🌐 USER NAVBAR -->
+<nav class="user-navbar">
+  <div class="navbar-container">
+    <a href="{{ url_for('home') }}" class="logo">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo" class="header-logo">
+    </a>
 
-    <main class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flashes">
-                    {% for category, message in messages %}
-                        <div class="alert {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+    <button class="burger" onclick="toggleNav()">☰</button>
 
-        {% block content %}{% endblock %}
-    </main>
+    <div class="nav-links" id="mainNavLinks">
+      <a href="{{ url_for('home') }}">Home</a>
+      <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('services') }}">Services</a>
+      <a href="{{ url_for('pricing') }}">Pricing</a>
+      <a href="{{ url_for('benefits') }}">Benefits</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; {{ current_year or 2025 }} Freezehouse | Built with ❄️</p>
-        </div>
-    </footer>
+      {% if current_user.is_authenticated %}
+        {% if current_user.is_admin %}
+          <a href="{{ url_for('admin') }}">Admin</a>
+        {% else %}
+          <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Login</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+<!-- ⚡ Flash Messages -->
+<main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flashes">
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<!-- 🌙 Footer -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; {{ current_year or 2025 }} Freezehouse | Built with ❄️</p>
+    </div>
+</footer>
+
+<!-- 📜 Scripts -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+<script>
+  function toggleNav() {
+    const nav = document.getElementById("mainNavLinks");
+    nav.classList.toggle("show");
+  }
+</script>
+
 </body>
 </html>

@@ -344,6 +344,138 @@ label, h2, h3, p {
   border-radius: 8px;
 }
 
+/* 🌐 User Navbar */
+.user-navbar {
+    background-color: #003366;
+    padding: 1rem;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logo img {
+    height: 40px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.nav-links a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.burger {
+    display: none;
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* Mobile Navbar */
+@media (max-width: 768px) {
+    .burger {
+        display: block;
+    }
+
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+        background-color: #003366;
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
+
+    .nav-links a {
+        padding: 12px 20px;
+    }
+}
+
+
+.user-navbar .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.user-navbar .logo img {
+    height: 40px;
+}
+
+.user-navbar .nav-links {
+    display: flex;
+    gap: 16px;
+}
+
+.user-navbar .nav-links a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.user-navbar .nav-links a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.user-navbar .burger {
+    display: none;
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .user-navbar .burger {
+        display: block;
+    }
+
+    .user-navbar .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .user-navbar .nav-links.show {
+        display: flex;
+    }
+
+    .user-navbar .nav-links a {
+        padding: 12px;
+    }
+}
+
+
 /* Optional: if you use form-control class or similar */
 input, select, textarea {
   color: #1a1a1a;

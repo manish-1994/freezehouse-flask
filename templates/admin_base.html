@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_users.css') }}">
-
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   {% block head %}{% endblock %}
@@ -18,17 +17,19 @@
 <div id="particles-overlay"></div>
 
 <!-- 🔗 Admin Navbar -->
-<nav class="navbar">
+<nav class="admin-navbar">
   <div class="navbar-container">
     <a href="{{ url_for('admin') }}" class="logo">
       <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Freezehouse Logo" class="header-logo">
     </a>
-    <div class="nav-links">
-      <a href="{{ url_for('admin') }}">Appointments</a> |
-      <a href="{{ url_for('admin_users') }}">Users</a> |
-      <a href="{{ url_for('manage_bath_types') }}">Bath Types</a> |
-      <a href="{{ url_for('manage_pricing') }}">Pricing</a> |
-      <a href="{{ url_for('manage_benefits') }}">Benefits</a> |
+    <button class="burger" onclick="toggleAdminNav()">☰</button>
+
+    <div class="nav-links" id="adminNavLinks">
+      <a href="{{ url_for('admin') }}">Appointments</a>
+      <a href="{{ url_for('admin_users') }}">Users</a>
+      <a href="{{ url_for('manage_bath_types') }}">Bath Types</a>
+      <a href="{{ url_for('manage_pricing') }}">Pricing</a>
+      <a href="{{ url_for('manage_benefits') }}">Benefits</a>
       <a href="{{ url_for('logout') }}">Logout</a>
     </div>
   </div>
@@ -42,7 +43,15 @@
 <!-- 💫 Particle Scripts -->
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
-{% block scripts %}{% endblock %}
 
+<!-- 🍔 Toggle Admin Navbar -->
+<script>
+  function toggleAdminNav() {
+    const nav = document.getElementById("adminNavLinks");
+    nav.classList.toggle("show");
+  }
+</script>
+
+{% block scripts %}{% endblock %}
 </body>
 </html>
