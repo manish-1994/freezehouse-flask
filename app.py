@@ -311,9 +311,11 @@ def contact(): return render_template('contact.html')
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    from datetime import date
+
     bath_types = BathType.query.all()
     appointments = Appointment.query.filter_by(user_id=current_user.id).all()
-    booked_slots = [(a.date.strftime('%Y-%m-%d'), a.time) for a in Appointment.query.all()]
+    booked_slots = [(a.date, a.time) for a in Appointment.query.all()]
 
     if request.method == 'POST':
         date_str = request.form['date']
@@ -321,44 +323,36 @@ def dashboard():
         reason = request.form['reason']
         bath_type = request.form['bath_type']
 
+        # ✅ This now happens after `date_str` is defined
+        if date_str < datetime.today().date().isoformat():
+            flash("You cannot book appointments in the past.")
+            return redirect(url_for('dashboard'))
+
         try:
-            selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-            selected_time = datetime.strptime(time_str, '%H:%M').time()
-
-            # ✅ Block past dates
-            if selected_date < datetime.today().date():
-                flash("❌ You cannot book an appointment for a past date.", "danger")
-                return redirect(url_for('dashboard'))
-
-            # ✅ Block time outside 9AM to 8PM
-            if selected_time < datetime.strptime("09:00", "%H:%M").time() or selected_time > datetime.strptime("20:00", "%H:%M").time():
-                flash("⏰ Please select a time between 9:00 AM and 8:00 PM.", "danger")
-                return redirect(url_for('dashboard'))
-
-        except ValueError:
-            flash("❌ Invalid date or time format.", "danger")
+            hour = int(time_str.split(':')[0])
+        except (ValueError, IndexError):
+            flash("Invalid time format.")
             return redirect(url_for('dashboard'))
 
-        # Check bath type
-        bath = BathType.query.filter_by(name=bath_type).first()
-        if not bath:
-            flash("❌ Invalid bath type selected.", "danger")
+        if hour < 9 or hour > 20:
+            flash("Appointments are only allowed between 9 AM and 8 PM.")
             return redirect(url_for('dashboard'))
 
-        # Check for booked slot
-        existing = Appointment.query.filter_by(date=selected_date, time=time_str).first()
+        existing = Appointment.query.filter_by(date=date_str, time=time_str).first()
         if existing:
-            flash("⚠️ That time slot is already booked.", "danger")
+            flash("Slot already booked.")
             return redirect(url_for('dashboard'))
 
-        # Save appointment
+        bath = BathType.query.filter_by(name=bath_type).first()
+        price = bath.price if bath else 0
+
         appt = Appointment(
             user_id=current_user.id,
-            date=selected_date,
+            date=date_str,
             time=time_str,
             reason=reason,
-            bath_type=bath.name,
-            price=bath.price
+            bath_type=bath_type,
+            price=price
         )
         db.session.add(appt)
         db.session.commit()
@@ -368,21 +362,22 @@ def dashboard():
 📞 Phone: {current_user.phone}
 📧 Email: {current_user.email}
 🛁 Bath Type: {bath_type}
-💸 Price: ₹{bath.price}
+💸 Price: ₹{price}
 🕒 Date/Time: {date_str} {time_str}
 📝 Reason: {reason}""")
 
-        flash("✅ Appointment booked successfully!", "success")
+        flash("✅ Appointment booked successfully.")
         return redirect(url_for('dashboard'))
 
-    today_str = datetime.today().strftime('%Y-%m-%d')
     return render_template(
         'dashboard.html',
         appointments=appointments,
         bath_types=bath_types,
         booked_slots=booked_slots,
-        current_date=today_str  # ✅ for min attribute in <input type="date">
+        current_date=date.today().isoformat()
     )
+
+
 
 # ========== WhatsApp Booking ==========
 @app.route('/whatsapp-booking', methods=['GET', 'POST'])
