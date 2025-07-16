@@ -117,6 +117,31 @@ def notify_admins(message):
             print(f"Telegram notify error: {e}")
 
 
+@app.route("/test-telegram")
+def test_telegram():
+    message = "✅ Test message from Freezehouse Telegram bot!"
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+
+    if not token or not chat_id:
+        error_msg = "❌ TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing"
+        app.logger.error(error_msg)
+        return error_msg, 500
+
+    try:
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            data={"chat_id": chat_id, "text": message},
+            timeout=5
+        )
+        app.logger.info(f"Telegram response: {response.status_code} - {response.text}")
+        return f"✅ Sent! Status: {response.status_code}, Response: {response.text}"
+    except Exception as e:
+        app.logger.exception("Telegram send failed")
+        return f"❌ Error: {str(e)}", 500
+
+
+
 # ========== Google Login ==========
 @app.route("/google-login")
 def google_login():
