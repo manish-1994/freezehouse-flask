@@ -9,12 +9,12 @@
   <h3>Book Appointment</h3>
   <form method="POST" id="booking-form">
     <label for="date">Date:</label>
-    <input type="date" name="date" id="date" required>
+    <input type="date" name="date" id="date" required min="{{ current_date }}">
 
     <label for="time">Time:</label>
     <select name="time" id="time" required>
       <option value="">Select a Time</option>
-      {% for hour in range(9, 22) %}
+      {% for hour in range(9, 21) %}
         {% set hour12 = hour if hour <= 12 else hour - 12 %}
         {% set suffix = "AM" if hour < 12 else "PM" %}
         {% set time_val = "%02d:00"|format(hour) %}
@@ -38,19 +38,17 @@
   <h3>Your Appointments</h3>
   <ul class="card-list">
     {% for appointment in appointments %}
-    <li class="card">
-      <strong>{{ appointment.date }} at {{ appointment.time }}</strong><br>
-      {{ appointment.reason }} | {{ appointment.bath_type }} | ₹{{ appointment.price }}<br>
-      <a href="{{ url_for('reschedule_appointment', id=appointment.id) }}">✏️ Reschedule</a>
-      &nbsp; 
-    </li>
+      <li class="card">
+        <strong>{{ appointment.date }} at {{ appointment.time }}</strong><br>
+        {{ appointment.reason }} | {{ appointment.bath_type }} | ₹{{ appointment.price }}<br>
+        <a href="{{ url_for('reschedule_appointment', id=appointment.id) }}">✏️ Reschedule</a>
+      </li>
     {% else %}
-    <li>No appointments yet.</li>
+      <li>No appointments yet.</li>
     {% endfor %}
   </ul>
 
-  <p><a href="{{ url_for('logout') }}" class="btn" style="margin-top: 20px; display: inline-block;">Logout</a></p>
-
+  <p><a href="{{ url_for('logout') }}" class="btn" style="margin-top: 20px;">Logout</a></p>
 </div>
 {% endblock %}
 
@@ -63,6 +61,10 @@
   const timeSelect = document.getElementById("time");
   const dateInput = document.getElementById("date");
 
+  // Block past dates
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.setAttribute('min', today);
+
   dateInput.addEventListener("change", function () {
     const selectedDate = this.value;
     const takenTimes = bookedSlots
@@ -70,18 +72,15 @@
       .map(slot => slot[1]);
 
     [...timeSelect.options].forEach(opt => {
-      if (opt.value && takenTimes.includes(opt.value)) {
+      if (opt.value === "") return;
+      if (takenTimes.includes(opt.value)) {
         opt.disabled = true;
         opt.textContent = opt.value + " (Booked)";
       } else {
         opt.disabled = false;
-        opt.textContent = opt.textContent.replace(" (Booked)", "");
+        opt.textContent = opt.value;
       }
     });
   });
-
-  // Block past dates
-  const today = new Date().toISOString().split('T')[0];
-  dateInput.setAttribute('min', today);
 </script>
 {% endblock %}
