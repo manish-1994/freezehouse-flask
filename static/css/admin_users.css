@@ -1,5 +1,6 @@
 /* admin_users.css */
 
+/* General Page Style */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f9ff;
@@ -8,44 +9,42 @@ body {
     color: #0C254C;
 }
 
-header {
-    background-color: #003366;
-    color: #fff;
-    padding: 1rem;
-    text-align: center;
-}
-
-header h1 {
-    margin: 0;
-}
-
-nav {
-    margin-top: 10px;
-}
-
-nav a {
-    color: #fff;
-    text-decoration: none;
-    margin: 0 10px;
-    font-weight: bold;
-}
-
-nav a:hover {
-    text-decoration: underline;
-}
-
-main {
+/* Container */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
     padding: 2rem;
-    color: #0C254C;
-    background-color: #f4f9ff;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Headings */
 h2 {
     color: #003366;
     margin-bottom: 20px;
     font-size: 1.8rem;
 }
 
+/* Flash Messages */
+.flash {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.flash-success {
+    background-color: #e6ffed;
+    color: #267a38;
+}
+
+.flash-danger {
+    background-color: #ffe6e6;
+    color: #cc0000;
+}
+
+/* Table Styles */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -53,6 +52,7 @@ table {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     border-radius: 6px;
     overflow: hidden;
+    margin-bottom: 20px;
 }
 
 table th,
@@ -78,68 +78,65 @@ table tr:hover {
     background-color: #e6f2ff;
 }
 
-.flash {
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 4px;
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.8rem;
     font-weight: bold;
+    border-radius: 4px;
+    text-align: center;
 }
 
-.flash-success {
-    background-color: #e6ffed;
+.badge-yes {
+    background-color: #d1f7e2;
     color: #267a38;
 }
 
-.flash-danger {
-    background-color: #ffe6e6;
-    color: #cc0000;
+.badge-no {
+    background-color: #fbeaea;
+    color: #c0392b;
 }
 
-/* 👇 Additional styling for admin/users page */
-
+/* Delete Link */
 .delete-link {
-    color: #cc0000;
+    color: #e74c3c;
     text-decoration: none;
     font-weight: bold;
+    padding: 4px 10px;
+    border: 1px solid #e74c3c;
+    border-radius: 4px;
+    transition: all 0.2s ease;
 }
 
 .delete-link:hover {
-    text-decoration: underline;
+    background-color: #e74c3c;
+    color: #fff;
 }
 
+/* Protected Text */
 .protected {
     color: gray;
     font-style: italic;
 }
 
-.back-button {
+/* Back Button */
+.btn {
     display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
     background-color: #0077cc;
     color: white;
-    text-decoration: none;
+    padding: 10px 20px;
     border-radius: 4px;
     font-weight: bold;
-    transition: background-color 0.2s;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
 }
 
-.back-button:hover {
+.btn:hover {
     background-color: #005fa3;
 }
 
-/* ✅/❌ badge style */
-.badge-yes {
-    color: green;
-    font-weight: bold;
-}
-
-.badge-no {
-    color: red;
-    font-weight: bold;
-}
-
-/* 📱 Responsive: stacked rows */
+/* Mobile Responsive Table */
 @media (max-width: 768px) {
     table, thead, tbody, th, td, tr {
         display: block;
@@ -162,53 +159,8 @@ table tr:hover {
         font-weight: bold;
         color: #003366;
     }
-}
 
-/* ✨ Badges */
-.badge {
-  display: inline-block;
-  padding: 4px 8px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.badge-yes {
-  background-color: #d1f7e2;
-  color: #267a38;
-}
-
-.badge-no {
-  background-color: #fbeaea;
-  color: #c0392b;
-}
-
-/* 🗑️ Delete Button */
-.delete-link {
-  color: #e74c3c;
-  text-decoration: none;
-  font-weight: bold;
-  padding: 4px 10px;
-  border: 1px solid #e74c3c;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.delete-link:hover {
-  background-color: #e74c3c;
-  color: #fff;
-}
-
-/* ✅ Flash Message */
-.flash {
-  padding: 12px;
-  margin-bottom: 20px;
-  border-radius: 4px;
-  font-weight: bold;
-}
-
-.flash-success {
-  background-color: #e6ffed;
-  color: #267a38;
+    table th {
+        display: none;
+    }
 }
