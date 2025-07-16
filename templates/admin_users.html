@@ -1,29 +1,56 @@
-{% extends 'admin_base.html' %}
+{% extends 'base.html' %}
+
+{% block title %}Admin - Users{% endblock %}
+
 
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_users.css') }}">
+<div class="container">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash flash-success">
+        {{ messages[0] }}
+      </div>
+    {% endif %}
+  {% endwith %}
 
-<h2>Registered Users</h2>
-<table>
+  <h2>Manage Users</h2>
+  <table>
     <thead>
-        <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Is Admin</th>
-        </tr>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Admin?</th>
+        <th>Actions</th>
+      </tr>
     </thead>
     <tbody>
-        {% for user in users %}
-        <tr>
-            <td data-label="ID">{{ user.id }}</td>
-            <td data-label="Username">{{ user.username }}</td>
-            <td data-label="Email">{{ user.email }}</td>
-            <td data-label="Phone">{{ user.phone }}</td>
-            <td data-label="Is Admin">{{ 'Yes' if user.is_admin else 'No' }}</td>
-        </tr>
-        {% endfor %}
+      {% for user in users %}
+      <tr>
+        <td data-label="ID">{{ user.id }}</td>
+        <td data-label="Name">{{ user.username }}</td>
+        <td data-label="Email">{{ user.email }}</td>
+        <td data-label="Phone">{{ user.phone }}</td>
+        <td data-label="Admin?">
+          {% if user.is_admin %}
+            <span class="badge badge-yes">Yes</span>
+          {% else %}
+            <span class="badge badge-no">No</span>
+          {% endif %}
+        </td>
+        <td data-label="Actions">
+          {% if not user.is_admin %}
+            <a href="{{ url_for('delete_user', id=user.id) }}" class="delete-link" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
+          {% else %}
+            <em>Protected</em>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+  <br>
+  <a href="{{ url_for('admin') }}" class="btn">⬅ Back to Admin Dashboard</a>
+</div>
 {% endblock %}

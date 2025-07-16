@@ -61,7 +61,7 @@ table td {
     border: 1px solid #cce0f5;
     text-align: left;
     font-size: 0.95rem;
-    color: #0C254C; /* ✅ Ensures readability */
+    color: #0C254C;
 }
 
 table th {
@@ -95,6 +95,51 @@ table tr:hover {
     color: #cc0000;
 }
 
+/* 👇 Additional styling for admin/users page */
+
+.delete-link {
+    color: #cc0000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.delete-link:hover {
+    text-decoration: underline;
+}
+
+.protected {
+    color: gray;
+    font-style: italic;
+}
+
+.back-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #0077cc;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #005fa3;
+}
+
+/* ✅/❌ badge style */
+.badge-yes {
+    color: green;
+    font-weight: bold;
+}
+
+.badge-no {
+    color: red;
+    font-weight: bold;
+}
+
+/* 📱 Responsive: stacked rows */
 @media (max-width: 768px) {
     table, thead, tbody, th, td, tr {
         display: block;
@@ -117,4 +162,53 @@ table tr:hover {
         font-weight: bold;
         color: #003366;
     }
+}
+
+/* ✨ Badges */
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.badge-yes {
+  background-color: #d1f7e2;
+  color: #267a38;
+}
+
+.badge-no {
+  background-color: #fbeaea;
+  color: #c0392b;
+}
+
+/* 🗑️ Delete Button */
+.delete-link {
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 4px 10px;
+  border: 1px solid #e74c3c;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.delete-link:hover {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+/* ✅ Flash Message */
+.flash {
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.flash-success {
+  background-color: #e6ffed;
+  color: #267a38;
 }

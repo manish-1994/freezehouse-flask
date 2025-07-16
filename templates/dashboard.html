@@ -42,8 +42,7 @@
       <strong>{{ appointment.date }} at {{ appointment.time }}</strong><br>
       {{ appointment.reason }} | {{ appointment.bath_type }} | ₹{{ appointment.price }}<br>
       <a href="{{ url_for('reschedule_appointment', id=appointment.id) }}">✏️ Reschedule</a>
-      &nbsp; | &nbsp;
-      <a href="{{ url_for('delete_appointment', id=appointment.id) }}" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
+      &nbsp; 
     </li>
     {% else %}
     <li>No appointments yet.</li>

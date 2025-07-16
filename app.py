@@ -78,13 +78,29 @@ class BathType(db.Model):
     price = db.Column(db.Float, nullable=False)
 
 class Appointment(db.Model):
+    __tablename__ = 'appointment'
+
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    date = db.Column(db.String(100))
-    time = db.Column(db.String(100))
-    reason = db.Column(db.String(250))
-    bath_type = db.Column(db.String(100))
-    price = db.Column(db.Float)
+    date = db.Column(db.String(20), nullable=False)
+    time = db.Column(db.String(20), nullable=False)
+    reason = db.Column(db.Text, nullable=False)
+    bath_type = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id', ondelete='CASCADE'),
+        nullable=False
+    )
+
+    user = db.relationship(
+        'User',
+        backref=db.backref('bookings', cascade="all, delete-orphan"),
+        passive_deletes=True
+    )
+
+
+
 
 class Pricing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -393,15 +409,15 @@ def reschedule_appointment(id):
 
     return render_template('reschedule.html', appointment=appt, bath_types=bath_types)
 
-@app.route('/delete/<int:id>')
-@login_required
-def delete_appointment(id):
-    appt = Appointment.query.get_or_404(id)
-    if appt.user_id == current_user.id:
-        db.session.delete(appt)
-        db.session.commit()
-        flash("Appointment deleted.")
-    return redirect(url_for('dashboard'))
+# @app.route('/delete/<int:id>')
+# @login_required
+# def delete_appointment(id):
+#     appt = Appointment.query.get_or_404(id)
+#     if appt.user_id == current_user.id:
+#         db.session.delete(appt)
+#         db.session.commit()
+#         flash("Appointment deleted.")
+#     return redirect(url_for('dashboard'))
 
 # ========== Admin Dashboard ==========
 @app.route('/admin')
