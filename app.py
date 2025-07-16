@@ -102,7 +102,8 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # ========== Helpers ==========
-def notify_admin(message):
+# Rename this helper to match usage across your app
+def notify_admins(message):
     token = os.getenv('TELEGRAM_BOT_TOKEN')
     chat_ids = os.getenv('TELEGRAM_CHAT_IDS').split(',')
     for chat_id in chat_ids:
@@ -112,11 +113,9 @@ def notify_admin(message):
                 data={"chat_id": chat_id.strip(), "text": message},
                 timeout=5
             )
-            logging.info(f"✅ Telegram sent to {chat_id} | Status: {res.status_code}")
         except Exception as e:
-            logging.error(f"❌ Telegram failed for {chat_id}: {e}")
-    for chat_id in ADMIN_CHAT_IDS:
-        requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", data={"chat_id": chat_id, "text": message})
+            print(f"Telegram notify error: {e}")
+
 
 # ========== Google Login ==========
 @app.route("/google-login")
