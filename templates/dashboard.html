@@ -35,7 +35,7 @@
     <button type="submit" class="btn">Book</button>
   </form>
 
-  <h3>Your Appointments</h3>
+  <h3 style="margin-top: 40px;">Your Appointments</h3>
   <ul class="card-list">
     {% for appointment in appointments %}
       <li class="card">
@@ -44,11 +44,13 @@
         <a href="{{ url_for('reschedule_appointment', id=appointment.id) }}">✏️ Reschedule</a>
       </li>
     {% else %}
-      <li>No appointments yet.</li>
+      <li style="margin-top: 10px;">No appointments yet.</li>
     {% endfor %}
   </ul>
 
-  <p><a href="{{ url_for('logout') }}" class="btn" style="margin-top: 20px;">Logout</a></p>
+  <div style="margin-top: 30px;">
+    <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+  </div>
 </div>
 {% endblock %}
 
