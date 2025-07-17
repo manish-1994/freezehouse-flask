@@ -1,14 +1,17 @@
-from flask import Flask, render_template, redirect, url_for, request, session, flash
+import io
+from flask import Flask, render_template, redirect, url_for, request, session, flash,send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from flask_mail import Mail, Message
 from flask_migrate import Migrate
 from flask_dance.contrib.google import make_google_blueprint, google
+from sqlalchemy import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import requests
 import random
 import os
+import pandas as pd
 from config import Config
 import logging
 
@@ -84,6 +87,7 @@ class Appointment(db.Model):
     date = db.Column(db.String(20), nullable=False)
     time = db.Column(db.String(20), nullable=False)
     reason = db.Column(db.Text, nullable=False)
+    delivery_option = db.Column(db.String(50), default='In-Store')  # ✅ New field
     bath_type = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False)
 
@@ -322,6 +326,8 @@ def dashboard():
         time_str = request.form['time']
         reason = request.form['reason']
         bath_type = request.form['bath_type']
+        delivery_option = request.form['delivery_option']  # ✅ NEW LINE
+
 
         # ✅ This now happens after `date_str` is defined
         if date_str < datetime.today().date().isoformat():
@@ -352,19 +358,20 @@ def dashboard():
             time=time_str,
             reason=reason,
             bath_type=bath_type,
-            price=price
+            price=price,
+            delivery_option=delivery_option
         )
         db.session.add(appt)
         db.session.commit()
-
         notify_admins(f"""📅 New Appointment:
-👤 Name: {current_user.username}
-📞 Phone: {current_user.phone}
-📧 Email: {current_user.email}
-🛁 Bath Type: {bath_type}
-💸 Price: ₹{price}
-🕒 Date/Time: {date_str} {time_str}
-📝 Reason: {reason}""")
+    👤 Name: {current_user.username}
+    📞 Phone: {current_user.phone}
+    📧 Email: {current_user.email}
+    🛁 Bath Type: {bath_type}
+    🚚 Service Type: {delivery_option}
+    💸 Price: ₹{price}
+    🕒 Date/Time: {date_str} {time_str}
+    📝 Reason: {reason}""")
 
         flash("✅ Appointment booked successfully.")
         return redirect(url_for('dashboard'))
@@ -376,7 +383,6 @@ def dashboard():
         booked_slots=booked_slots,
         current_date=date.today().isoformat()
     )
-
 
 
 # ========== WhatsApp Booking ==========
@@ -467,6 +473,24 @@ def admin():
     if not current_user.is_admin:
         return redirect(url_for('login'))
     appointments = db.session.query(Appointment, User).join(User).all()
+
+      # --- 📊 Analytics ---
+    # Bookings per day (last 7 days)
+    bookings_per_day = db.session.query(
+        Appointment.date, func.count(Appointment.id)
+    ).group_by(Appointment.date).order_by(Appointment.date.desc()).limit(7).all()
+
+    # Most popular bath types
+    top_bath_types = db.session.query(
+        Appointment.bath_type, func.count(Appointment.id)
+    ).group_by(Appointment.bath_type).order_by(func.count(Appointment.id).desc()).limit(5).all()
+
+    return render_template(
+        'admin.html',
+        appointments=appointments,
+        bookings_per_day=bookings_per_day,
+        top_bath_types=top_bath_types
+    )
     return render_template('admin.html', appointments=appointments)
 
 @app.route('/admin/delete/<int:id>')
@@ -566,6 +590,39 @@ def delete_pricing(id):
     db.session.commit()
     flash("✅ Pricing item deleted.", "success")
     return redirect(url_for('manage_pricing'))
+
+@app.route('/admin/export_excel')
+@login_required
+def export_excel():
+    if not current_user.is_admin:
+        flash("Admin access required", "danger")
+        return redirect(url_for('admin'))
+
+    # Query appointments and users
+    appointments = Appointment.query.all()
+    data = []
+    for appt in appointments:
+        user = User.query.get(appt.user_id)
+        data.append({
+            "Date": appt.date,
+            "Time": appt.time,
+            "Bath Type": appt.bath_type,
+            "Price": appt.price,
+            "Reason": appt.reason,
+            "Delivery": appt.delivery_option,
+            "User Name": user.username if user else "Unknown",
+            "Email": user.email if user else "Unknown",
+            "Phone": user.phone if user else "Unknown"
+        })
+
+    # Convert to Excel
+    df = pd.DataFrame(data)
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Appointments')
+
+    output.seek(0)
+    return send_file(output, as_attachment=True, download_name="appointments.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
 

@@ -2,6 +2,9 @@
 
 {% block content %}
 <h2>All Appointments (Including WhatsApp)</h2>
+<p>
+  <a class="btn" href="{{ url_for('export_excel') }}">📁 Export Appointments to Excel</a>
+</p>
 <ul class="card-list">
   {% for appointment, user in appointments %}
     <li class="card">
@@ -17,4 +20,24 @@
     <li class="card">No appointments found.</li>
   {% endfor %}
 </ul>
+
+<hr>
+<h2>📊 Admin Analytics</h2>
+
+<h3>🗓 Bookings per Day</h3>
+<ul>
+  {% for date, count in bookings_per_day %}
+    <li><strong>{{ date }}</strong>: {{ count }} bookings</li>
+  {% endfor %}
+</ul>
+
+<h3>🔥 Most Popular Bath Types</h3>
+<ul>
+  {% for bath_type, count in top_bath_types %}
+    <li><strong>{{ bath_type }}</strong>: {{ count }} bookings</li>
+  {% endfor %}
+</ul>
+
 {% endblock %}
+
+
