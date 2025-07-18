@@ -90,6 +90,9 @@ class Appointment(db.Model):
     delivery_option = db.Column(db.String(50), default='In-Store')  # ✅ New field
     bath_type = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False)
+    reschedule_count = db.Column(db.Integer, default=0)
+
+
 
     user_id = db.Column(
         db.Integer,
@@ -136,6 +139,12 @@ def notify_admins(message):
         except Exception as e:
             print(f"Telegram notify error: {e}")
 
+@app.template_filter('format_12hr')
+def format_12hr(time_str):
+    try:
+        return datetime.strptime(time_str, '%H:%M').strftime('%I:%M %p')
+    except Exception:
+        return time_str
 
 @app.route("/test-telegram")
 def test_telegram():
@@ -434,13 +443,32 @@ def reschedule_appointment(id):
         return redirect(url_for('dashboard'))
 
     bath_types = BathType.query.all()
+
     if request.method == 'POST':
-        appt.date = request.form['date']
-        appt.time = request.form['time']
+        new_date = request.form['date']
+        new_time = request.form['time']
+
+        # Validate: Prevent past date
+        selected_datetime = datetime.strptime(f"{new_date} {new_time}", '%Y-%m-%d %H:%M')
+        now = datetime.now()
+        if selected_datetime < now:
+            flash("Cannot reschedule to a past date and time.", "danger")
+            return redirect(url_for('reschedule_appointment', id=id))
+
+        # Validate: Only between 9 AM to 8 PM
+        selected_hour = selected_datetime.hour
+        if selected_hour < 9 or selected_hour >= 20:
+            flash("Please select a time between 9 AM and 8 PM.", "danger")
+            return redirect(url_for('reschedule_appointment', id=id))
+
+        # Valid - proceed with update
+        appt.date = new_date
+        appt.time = new_time
         appt.reason = request.form['reason']
         appt.bath_type = request.form['bath_type']
         bath = BathType.query.filter_by(name=appt.bath_type).first()
         appt.price = bath.price if bath else 0
+        appt.reschedule_count = (appt.reschedule_count or 0) + 1
         db.session.commit()
 
         notify_admins(f"""🔁 Appointment Rescheduled:
@@ -455,6 +483,7 @@ def reschedule_appointment(id):
         return redirect(url_for('dashboard'))
 
     return render_template('reschedule.html', appointment=appt, bath_types=bath_types)
+
 
 # @app.route('/delete/<int:id>')
 # @login_required
@@ -502,6 +531,22 @@ def admin_delete(id):
     db.session.commit()
     flash("Appointment deleted by admin.")
     return redirect(url_for('admin'))
+
+@app.route('/admin/add_reschedule/<int:appointment_id>')
+@login_required
+def admin_add_reschedule(appointment_id):
+    if not current_user.is_admin:
+        flash("Unauthorized", "danger")
+        return redirect(url_for('dashboard'))
+
+    appt = Appointment.query.get_or_404(appointment_id)
+    appt.reschedule_count = (appt.reschedule_count or 0) - 1  # Give 1 more reschedule
+    if appt.reschedule_count < 0:
+        appt.reschedule_count = 0
+    db.session.commit()
+    flash("➕ Extra reschedule granted for this appointment.", "success")
+    return redirect(url_for('admin'))
+
 
 # ========== Admin User Management ==========
 @app.route('/admin/users')

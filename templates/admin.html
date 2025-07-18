@@ -8,18 +8,30 @@
 <ul class="card-list">
   {% for appointment, user in appointments %}
     <li class="card">
-      <strong>📅 {{ appointment.date }} at {{ appointment.time }}</strong><br>
+      <strong>📅 {{ appointment.date }} at {{ appointment.time|format_12hr}}</strong><br>
       <strong>👤 User:</strong> {{ user.username }}<br>
       <strong>📞 Phone:</strong> {{ user.phone or 'N/A' }}<br>
       <strong>📧 Email:</strong> {{ user.email or 'N/A' }}<br>
       <strong>🛁 Bath Type:</strong> {{ appointment.bath_type }} - ₹{{ appointment.price }}<br>
       <strong>📝 Reason:</strong> {{ appointment.reason }}<br>
+
+      {% set left = 2 - (appointment.reschedule_count or 0) %}
+      <strong>🔁 Reschedules Left:</strong> 
+      <span {% if left == 0 %}style="color: red;"{% endif %}>{{ left }}</span><br>
+
+      {% if left == 0 %}
+        <div style="color: red;"><strong>❌ No reschedules left!</strong></div>
+      {% endif %}
+
+      <a href="{{ url_for('admin_add_reschedule', appointment_id=appointment.id) }}" class="btn">➕ Add Reschedule</a><br><br>
+
       <a href="{{ url_for('admin_delete', id=appointment.id) }}" class="btn" onclick="return confirm('Are you sure you want to delete this appointment?')">🗑 Delete</a>
     </li>
   {% else %}
     <li class="card">No appointments found.</li>
   {% endfor %}
 </ul>
+
 
 <hr>
 <h2>📊 Admin Analytics</h2>
