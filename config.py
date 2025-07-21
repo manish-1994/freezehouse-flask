@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from supabase import create_client
 
 load_dotenv(dotenv_path='.env', override=True)
 print("Loaded MAIL_USERNAME =", os.getenv("MAIL_USERNAME"))
@@ -21,3 +22,9 @@ class Config:
     TELEGRAM_CHAT_IDS = os.getenv("TELEGRAM_CHAT_IDS", "").split(',')
 
     OAUTHLIB_INSECURE_TRANSPORT = "1"
+
+SECRET_KEY = os.getenv("SECRET_KEY", "default-secret")
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)

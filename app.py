@@ -1,4 +1,3 @@
-import io
 from flask import Flask, render_template, redirect, url_for, request, session, flash,send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
@@ -11,9 +10,11 @@ from datetime import datetime
 import requests
 import random
 import os
+import io
 import pandas as pd
-from config import Config
+from config import Config,supabase
 import logging
+
 
 
 # Allow OAuth over HTTP (for development only!)
@@ -60,6 +61,7 @@ app.register_blueprint(google_bp, url_prefix="/login")
 
 # ========== Models ==========
 class User(db.Model, UserMixin):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     username = db.Column(db.String(150), nullable=False)
@@ -743,3 +745,4 @@ if __name__ == "__main__":
             print("🔗 Google OAuth Redirect URL:", url_for("google.login", _external=True))
 
     app.run(debug=True)
+
