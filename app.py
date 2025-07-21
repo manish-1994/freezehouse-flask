@@ -4,7 +4,7 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, log
 from flask_mail import Mail, Message
 from flask_migrate import Migrate
 from flask_dance.contrib.google import make_google_blueprint, google
-from sqlalchemy import func
+from sqlalchemy import func,create_engine
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import requests
@@ -15,6 +15,10 @@ import pandas as pd
 from config import Config,supabase
 import logging
 
+from sqlalchemy import create_engine
+engine = create_engine("postgresql://postgres.hwwmkkzvquckhowsdold:wKiK216gMSmx7H5J@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres")
+with engine.connect() as conn:
+    print("✅ Connection succeeded")
 
 
 # Allow OAuth over HTTP (for development only!)
