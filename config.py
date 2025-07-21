@@ -1,11 +1,16 @@
 import os
 from dotenv import load_dotenv
 from supabase import create_client
+from sqlalchemy import create_engine
 
 load_dotenv(dotenv_path='.env', override=True)
-print("Loaded MAIL_USERNAME =", os.getenv("MAIL_USERNAME"))
+db_url = os.getenv("SQLALCHEMY_DATABASE_URI")
+engine = create_engine(db_url)
 
-print("CWD =", os.getcwd()) 
+with engine.connect() as conn:
+    print("✅ Connected to Supabase!")
+
+ 
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-dev-secret')
