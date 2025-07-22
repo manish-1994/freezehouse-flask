@@ -14,6 +14,17 @@
 
   <h2>Manage Users</h2>
 
+  <!-- Filter Dropdown -->
+  <form method="GET" action="{{ url_for('admin_users') }}" style="margin-bottom: 20px;">
+    <label>Filter by Membership:</label>
+    <select name="filter" onchange="this.form.submit()">
+      <option value="All" {% if current_filter == 'All' %}selected{% endif %}>All</option>
+      {% for level in membership_levels %}
+        <option value="{{ level }}" {% if current_filter == level %}selected{% endif %}>{{ level }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
   <table>
     <thead>
       <tr>
@@ -22,24 +33,42 @@
         <th>Email</th>
         <th>Phone</th>
         <th>Admin?</th>
+        <th>Membership</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       {% for user in users %}
       <tr>
-        <td data-label="ID">{{ user.id }}</td>
-        <td data-label="Name">{{ user.username }}</td>
-        <td data-label="Email">{{ user.email }}</td>
-        <td data-label="Phone">{{ user.phone if user.phone else '—' }}</td>
-        <td data-label="Admin?">
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.phone or '—' }}</td>
+        <td>
           {% if user.is_admin %}
             <span class="badge badge-yes">Yes</span>
           {% else %}
             <span class="badge badge-no">No</span>
           {% endif %}
         </td>
-        <td data-label="Actions">
+        <td>
+          {% if user.membership_type %}
+            <span class="badge badge-{{ user.membership_type|lower }}">{{ user.membership_type }}</span>
+          {% else %}
+            <span class="badge badge-no">None</span>
+          {% endif %}
+        </td>
+        <td>
+          <!-- Membership Form -->
+          <form method="POST" style="display:inline-block;">
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <select name="membership_type" onchange="this.form.submit()">
+              {% for level in membership_levels %}
+                <option value="{{ level }}" {% if user.membership_type == level or (not user.membership_type and level == 'None') %}selected{% endif %}>{{ level }}</option>
+              {% endfor %}
+            </select>
+          </form>
+
           {% if not user.is_admin %}
             <a href="{{ url_for('delete_user', id=user.id) }}" class="delete-link" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
           {% else %}
@@ -53,4 +82,25 @@
 
   <a href="{{ url_for('admin') }}" class="btn">⬅ Back to Admin Dashboard</a>
 </div>
+
+<style>
+  .badge-gold {
+    background: gold;
+    color: black;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .badge-platinum {
+    background: #e5e4e2;
+    color: #333;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .badge-diamond {
+    background: #b9f2ff;
+    color: #0e3d5c;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+</style>
 {% endblock %}

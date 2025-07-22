@@ -3,76 +3,127 @@
 {% block title %}Dashboard - Freezehouse{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h2>Welcome, {{ current_user.username }}</h2>
+<div id="particles-js"></div>
+<div class="dashboard">
+  
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <h1> Welcome, <span class="user-name">{{ current_user.username }}</span></h1>
 
-  <h3>Book Appointment</h3>
-  <form method="POST" id="booking-form">
-    <label for="date">Date:</label>
-    <input type="date" name="date" id="date" required min="{{ current_date }}">
+     {% if current_user.membership_type %}
+  <div class="badge-section">
+    <img src="{{ url_for('static', filename='img/member.jpg') }}" alt="Member Badge" class="profile-image">
 
-    <label for="time">Time:</label>
-    <select name="time" id="time" required>
-      <option value="">Select a Time</option>
-      {% for hour in range(9, 21) %}
-        {% set hour12 = hour if hour <= 12 else hour - 12 %}
-        {% set suffix = "AM" if hour < 12 else "PM" %}
-        {% set time_val = "%02d:00"|format(hour) %}
-        <option value="{{ time_val }}">{{ "%02d:00"|format(hour12) }} {{ suffix }}</option>
-      {% endfor %}
-    </select>
+    <p class="membership-line">
+       You are a 
+      {% if current_user.membership_type == 'Diamond' %}
+        <strong style="color: darkblue;">💎 Diamond Member</strong>
+      {% elif current_user.membership_type == 'Platinum' %}
+        <strong style="color: teal;">🏆 Platinum Member</strong>
+      {% elif current_user.membership_type == 'Gold' %}
+        <strong style="color: goldenrod;">🥇 Gold Member</strong>
+      {% else %}
+        <strong>{{ current_user.membership_type }} Member</strong>
+      {% endif %}
+    </p>
+  </div>
+{% endif %}
 
-    <label for="reason">Reason/Address:</label>
-    <textarea name="reason" id="reason" placeholder="Reason/Address" required></textarea>
 
-    <div class="form-group">
-  <label for="delivery_option">Service Type:</label>
-  <select name="delivery_option" id="delivery_option" class="form-control" required>
-    <option value="In-Store">In-Store</option>
-    <option value="Home Delivery">Home Delivery</option>
-    <option value="Rental">Rental</option>
+    <!-- Booking Form -->
+    <div class="card booking-card">
+      <h3>📅 Book Appointment</h3>
+      <form method="POST" id="booking-form">
+        <div class="form-group">
+          <label for="date">📆 Date:</label>
+          <input type="date" name="date" id="date" required class="form-control" min="{{ current_date }}">
+        </div>
+
+        <div class="form-group">
+          <label for="time">⏰ Time:</label>
+          <select name="time" id="time" required class="form-control">
+            <option value="">Select a Time</option>
+            {% for hour in range(9, 21) %}
+              {% set hour12 = hour if hour <= 12 else hour - 12 %}
+              {% set suffix = "AM" if hour < 12 else "PM" %}
+              {% set time_val = "%02d:00"|format(hour) %}
+              <option value="{{ time_val }}">{{ "%02d:00"|format(hour12) }} {{ suffix }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+  <label for="gender">👤 Gender:</label>
+  <select name="gender" id="gender" class="form-control" required>
+    <option value="" disabled selected>Select your gender</option>
+    <option value="Male" {% if current_user.gender == "Male" %}selected{% endif %}>Male</option>
+    <option value="Female" {% if current_user.gender == "Female" %}selected{% endif %}>Female</option>
+    <option value="Other" {% if current_user.gender == "Other" %}selected{% endif %}>Other</option>
   </select>
-  </div>
+</div>
 
-    <label for="bath_type">Bath Type:</label>
-    <select name="bath_type" id="bath_type" required>
-      {% for bath in bath_types %}
-        <option value="{{ bath.name }}">{{ bath.name }} - ₹{{ bath.price }}</option>
-      {% endfor %}
-    </select>
 
-    <button type="submit" class="btn">Book</button>
-  </form>
 
-  <h3 style="margin-top: 40px;">Your Appointments</h3>
-  <ul class="card-list">
-    {% for appointment in appointments %}
-      <li class="card">
-        <strong>{{ appointment.date }} at {{ appointment.time }}</strong><br>
-        {{ appointment.reason }} | {{ appointment.bath_type }} | ₹{{ appointment.price }}<br>
-        <a href="{{ url_for('reschedule_appointment', id=appointment.id) }}">✏️ Reschedule</a>
-      </li>
-    {% else %}
-      <li style="margin-top: 10px;">No appointments yet.</li>
-    {% endfor %}
-  </ul>
+        <div class="form-group">
+          <label for="reason">📍 Reason/Address:</label>
+          <textarea name="reason" id="reason" class="form-control" placeholder="Enter reason or delivery address..." required></textarea>
+        </div>
 
-  <div style="margin-top: 30px;">
-    <a href="{{ url_for('logout') }}" class="btn">Logout</a>
-  </div>
+        <div class="form-group">
+          <label for="delivery_option">🚚 Service Type:</label>
+          <select name="delivery_option" id="delivery_option" class="form-control" required>
+            <option value="In-Store">In-Store</option>
+            <option value="Home Delivery">Home Delivery</option>
+            <option value="Rental">Rental</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="bath_type">🛁 Bath Type:</label>
+          <select name="bath_type" id="bath_type" class="form-control" required>
+            {% for bath in bath_types %}
+              <option value="{{ bath.name }}">{{ bath.name }} - ₹{{ bath.price }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Book Appointment</button>
+      </form>
+    </div>
+
+    <!-- Appointments List -->
+    <div class="card appointments-card">
+      <h3>📜 Your Appointments</h3>
+      {% if appointments %}
+      <ul class="card-list">
+        {% for appointment in appointments %}
+          <li class="appointment-card">
+            <div><strong>{{ appointment.date }} at {{ appointment.time }}</strong></div>
+            <div>{{ appointment.reason }} | {{ appointment.bath_type }} | ₹{{ appointment.price }}</div>
+            <a href="{{ url_for('reschedule_appointment', id=appointment.id) }}" class="btn-link">✏️ Reschedule</a>
+          </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No appointments yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="logout-link">
+      <a href="{{ url_for('logout') }}" class="btn btn-danger">🚪 Logout</a>
+    </div>
+  
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
-
 <script>
   const bookedSlots = {{ booked_slots | tojson | safe }};
   const timeSelect = document.getElementById("time");
   const dateInput = document.getElementById("date");
 
-  // Block past dates
   const today = new Date().toISOString().split('T')[0];
   dateInput.setAttribute('min', today);
 

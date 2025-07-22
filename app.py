@@ -42,6 +42,8 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 
+
+
 # ========== Telegram Setup ==========
 BOT_TOKEN = app.config['TELEGRAM_BOT_TOKEN']
 ADMIN_CHAT_IDS = app.config['TELEGRAM_CHAT_IDS']
@@ -71,6 +73,11 @@ class User(db.Model, UserMixin):
     dob = db.Column(db.String(20), nullable=True)
     password = db.Column(db.String(255), nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
+    is_member = db.Column(db.Boolean, default=False)
+    membership_type = db.Column(db.String(50), default="None")
+    gender = db.Column(db.String(10), nullable=True)
+
+
 
 class OTPStore(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -131,14 +138,21 @@ def load_user(user_id):
 # Rename this helper to match usage across your app
 def notify_admins(message):
     token = os.getenv('TELEGRAM_BOT_TOKEN')
-    chat_ids = os.getenv('TELEGRAM_CHAT_IDS').split(',')
+    chat_ids = os.getenv('TELEGRAM_CHAT_IDS', '').split(',')
+
     for chat_id in chat_ids:
         try:
-            res = requests.post(
+            response = requests.post(
                 f"https://api.telegram.org/bot{token}/sendMessage",
-                data={"chat_id": chat_id.strip(), "text": message},
+                data={
+                    "chat_id": chat_id.strip(),
+                    "text": message,
+                    "parse_mode": "HTML"  # Optional: allows <b>, <i>, etc.
+                },
                 timeout=5
             )
+            if response.status_code != 200:
+                print(f"Telegram notify failed: {response.status_code} - {response.text}")
         except Exception as e:
             print(f"Telegram notify error: {e}")
 
@@ -339,7 +353,11 @@ def dashboard():
         reason = request.form['reason']
         bath_type = request.form['bath_type']
         delivery_option = request.form['delivery_option']  # ✅ NEW LINE
+        gender = request.form.get('gender') # ✅ NEW LINE
 
+        if gender and gender != current_user.gender:
+            current_user.gender = gender
+            db.session.commit()
 
         # ✅ This now happens after `date_str` is defined
         if date_str < datetime.today().date().isoformat():
@@ -383,7 +401,8 @@ def dashboard():
     🚚 Service Type: {delivery_option}
     💸 Price: ₹{price}
     🕒 Date/Time: {date_str} {time_str}
-    📝 Reason: {reason}""")
+    📝 Reason: {reason}
+    Gender: {current_user.gender or 'Not specified'}""")
 
         flash("✅ Appointment booked successfully.")
         return redirect(url_for('dashboard'))
@@ -395,6 +414,34 @@ def dashboard():
         booked_slots=booked_slots,
         current_date=date.today().isoformat()
     )
+
+@app.route('/make_member/<int:user_id>', methods=['GET','POST']) 
+@login_required
+def make_member(user_id):
+    if not current_user.is_admin:
+        flash("You are not authorized to perform this action.", "danger")
+        return redirect(url_for('dashboard'))
+
+    user = User.query.get_or_404(user_id)
+    user.is_member = True
+    db.session.commit()
+    flash(f"{user.username} has been marked as a member.", "success")
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/toggle_member/<int:user_id>', methods=['POST'])
+@login_required
+def toggle_member(user_id):
+    if not current_user.is_admin:
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+    
+    user = User.query.get_or_404(user_id)
+    user.is_member = not user.is_member
+    db.session.commit()
+    flash(f"{user.username} is now {'a member' if user.is_member else 'not a member'}", "success")
+    return redirect(url_for('admin_users'))
+
+
 
 
 # ========== WhatsApp Booking ==========
@@ -552,15 +599,35 @@ def admin_add_reschedule(appointment_id):
 
 
 # ========== Admin User Management ==========
-@app.route('/admin/users')
+@app.route('/admin/users', methods=['GET', 'POST'])
 @login_required
 def admin_users():
     if not current_user.is_admin:
         flash("Access denied", "danger")
         return redirect(url_for('home'))
 
-    users = User.query.all()
-    return render_template('admin_users.html', users=users)
+    # Update membership type if a form was submitted
+    if request.method == 'POST':
+        user_id = request.form.get('user_id')
+        membership = request.form.get('membership_type')
+        user = User.query.get(user_id)
+        if user:
+            user.membership_type = membership if membership != "None" else None
+            db.session.commit()
+            flash(f"Updated membership for {user.username} to {membership}", "success")
+        return redirect(url_for('admin_users'))
+
+    # Filter users if a filter is applied
+    filter_type = request.args.get('filter')
+    if filter_type and filter_type != "All":
+        users = User.query.filter_by(membership_type=filter_type).all()
+    else:
+        users = User.query.all()
+
+    membership_levels = ['None', 'Gold', 'Platinum', 'Diamond']
+
+    return render_template('admin_users.html', users=users, membership_levels=membership_levels, current_filter=filter_type or "All")
+
 
 @app.route('/admin/delete-user/<int:id>')
 @login_required
