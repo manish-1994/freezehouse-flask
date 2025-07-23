@@ -180,33 +180,23 @@ input:checked + .slider:before {
 }
 
 /* 📱 Responsive Table */
+/* 📱 Fully Responsive Table (Improved for iPhone) */
 @media (max-width: 768px) {
-  table, thead, tbody, th, td, tr {
-    display: block;
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #ddd;
+    border-radius: 6px;
   }
 
-  thead {
-    display: none;
+  table {
+    width: 100%;
+    min-width: 700px; /* Ensures table scrolls on smaller screens */
+    font-size: 14px;
   }
 
-  tr {
-    margin-bottom: 1rem;
-  }
-
-  td {
-    position: relative;
-    padding-left: 50%;
-    border: 1px solid #cce0f5;
-  }
-
-  td::before {
-    position: absolute;
-    top: 12px;
-    left: 16px;
-    width: 45%;
+  th, td {
     white-space: nowrap;
-    font-weight: bold;
-    color: #003366;
-    content: attr(data-label);
   }
 }
