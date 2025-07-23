@@ -664,7 +664,7 @@ def admin_users():
     else:
         users = User.query.all()
 
-    membership_levels = ['None', 'Gold', 'Platinum', 'Diamond']
+    membership_levels = ['None', 'Gold', 'Platinum', 'Silver']
 
     return render_template('admin_users.html', users=users, membership_levels=membership_levels, current_filter=filter_type or "All")
 

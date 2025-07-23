@@ -4,6 +4,7 @@
 
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_users.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
@@ -17,17 +18,18 @@
   <h2>Manage Users</h2>
 
   <form method="GET" action="{{ url_for('admin_users') }}" class="filter-form">
-    <label>Filter by Membership:</label>
-    <select name="filter" onchange="this.form.submit()">
+    <label for="filter">Filter by Membership:</label>
+    <select name="filter" id="filter" onchange="this.form.submit()">
       <option value="All" {% if current_filter == 'All' %}selected{% endif %}>All</option>
       {% for level in membership_levels %}
-        <option value="{{ level }}" {% if current_filter == level %}selected{% endif %}>{{ level }}</option>
+        {% set display_level = 'Silver' if level == 'Diamond' else level %}
+        <option value="{{ level }}" {% if current_filter == level %}selected{% endif %}>{{ display_level }}</option>
       {% endfor %}
     </select>
   </form>
 
   <div class="table-wrapper">
-    <table>
+    <table class="user-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -54,9 +56,8 @@
           </td>
           <td data-label="Membership">
             {% if user.membership_type %}
-              <span class="badge badge-{{ user.membership_type|lower }}">{{ user.membership_type }}</span>
-            {% else %}
-              <span class="badge badge-no">None</span>
+              {% set display_type = 'Silver' if user.membership_type == 'Diamond' else user.membership_type %}
+              <span class="badge badge-{{ display_type|lower }}">{{ display_type }}</span>
             {% endif %}
           </td>
           <td data-label="Blocked">
@@ -72,19 +73,24 @@
             {% endif %}
           </td>
           <td data-label="Actions">
-            <form method="POST" style="display:inline;">
-              <input type="hidden" name="user_id" value="{{ user.id }}">
-              <select name="membership_type" onchange="this.form.submit()">
-                {% for level in membership_levels %}
-                  <option value="{{ level }}" {% if user.membership_type == level %}selected{% endif %}>{{ level }}</option>
-                {% endfor %}
-              </select>
-            </form>
-            {% if not user.is_admin %}
-              <a href="{{ url_for('delete_user', id=user.id) }}" class="delete-link" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
-            {% else %}
-              <em class="protected">Protected</em>
-            {% endif %}
+            <div class="actions-cell">
+              <form method="POST" action="{{ url_for('admin_users') }}">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <select name="membership_type" onchange="this.form.submit()">
+                  {% for level in membership_levels %}
+                    {% set display_label = 'Silver' if level == 'Diamond' else level %}
+                    <option value="{{ level }}" {% if user.membership_type == level %}selected{% endif %}>{{ display_label }}</option>
+                  {% endfor %}
+                </select>
+              </form>
+              {% if not user.is_admin %}
+                <a href="{{ url_for('delete_user', id=user.id) }}" class="delete-link" title="Delete" onclick="return confirm('Are you sure you want to delete this user?')">
+                  <i class="fas fa-trash-alt"></i> Delete
+                </a>
+              {% else %}
+                <em class="protected">Protected</em>
+              {% endif %}
+            </div>
           </td>
         </tr>
         {% endfor %}
