@@ -10,25 +10,31 @@
     <div class="welcome-section">
       <h1> Welcome, <span class="user-name">{{ current_user.username }}</span></h1>
 
-     {% if current_user.membership_type %}
-  <div class="badge-section">
-    <img src="{{ url_for('static', filename='img/member.jpg') }}" alt="Member Badge" class="profile-image">
-
-    <p class="membership-line">
-       You are a 
-      {% if current_user.membership_type == 'Diamond' %}
-        <strong style="color: darkblue;">💎 Diamond Member</strong>
-      {% elif current_user.membership_type == 'Platinum' %}
-        <strong style="color: teal;">🏆 Platinum Member</strong>
-      {% elif current_user.membership_type == 'Gold' %}
-        <strong style="color: goldenrod;">🥇 Gold Member</strong>
-      {% else %}
-        <strong>{{ current_user.membership_type }} Member</strong>
+      {% if current_user.membership_type %}
+      <div class="badge-section">
+        <img src="{{ url_for('static', filename='img/member.jpg') }}" alt="Member Badge" class="profile-image">
+        <p class="membership-line">
+          You are a 
+          {% if current_user.membership_type == 'Diamond' %}
+            <strong style="color: darkblue;">💎 Diamond Member</strong>
+          {% elif current_user.membership_type == 'Platinum' %}
+            <strong style="color: teal;">🏆 Platinum Member</strong>
+          {% elif current_user.membership_type == 'Gold' %}
+            <strong style="color: goldenrod;">🥇 Gold Member</strong>
+          {% else %}
+            <strong>{{ current_user.membership_type }} Member</strong>
+          {% endif %}
+        </p>
+      </div>
       {% endif %}
-    </p>
-  </div>
-{% endif %}
 
+      {% if missing_phone %}
+      <div class="alert alert-warning mt-3">
+        📱 <strong>Update Required:</strong> Please <a href="{{ url_for('profile') }}">add your phone number</a> to complete your profile.
+      </div>
+      {% endif %}
+
+    </div>
 
     <!-- Booking Form -->
     <div class="card booking-card">
@@ -53,16 +59,14 @@
         </div>
 
         <div class="form-group">
-  <label for="gender">👤 Gender:</label>
-  <select name="gender" id="gender" class="form-control" required>
-    <option value="" disabled selected>Select your gender</option>
-    <option value="Male" {% if current_user.gender == "Male" %}selected{% endif %}>Male</option>
-    <option value="Female" {% if current_user.gender == "Female" %}selected{% endif %}>Female</option>
-    <option value="Other" {% if current_user.gender == "Other" %}selected{% endif %}>Other</option>
-  </select>
-</div>
-
-
+          <label for="gender">👤 Gender:</label>
+          <select name="gender" id="gender" class="form-control" required>
+            <option value="" disabled selected>Select your gender</option>
+            <option value="Male" {% if current_user.gender == "Male" %}selected{% endif %}>Male</option>
+            <option value="Female" {% if current_user.gender == "Female" %}selected{% endif %}>Female</option>
+            <option value="Other" {% if current_user.gender == "Other" %}selected{% endif %}>Other</option>
+          </select>
+        </div>
 
         <div class="form-group">
           <label for="reason">📍 Reason/Address:</label>

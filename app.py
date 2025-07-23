@@ -76,6 +76,8 @@ class User(db.Model, UserMixin):
     is_member = db.Column(db.Boolean, default=False)
     membership_type = db.Column(db.String(50), default="None")
     gender = db.Column(db.String(10), nullable=True)
+    is_blocked = db.Column(db.Boolean, default=False)
+
 
 
 
@@ -220,6 +222,20 @@ def google_login():
 
     flash("Logged in with Google!", "success")
     return redirect(url_for('dashboard' if not user.is_admin else 'admin'))
+
+# ========== Phone Number Management ==========
+@app.route('/add-phone', methods=['POST'])
+@login_required
+def add_phone():
+    phone = request.form.get('phone')
+    if phone and phone.isdigit() and len(phone) == 10:
+        current_user.phone = phone
+        db.session.commit()
+        flash("📱 Phone number added successfully.", "success")
+    else:
+        flash("❌ Invalid phone number. Please enter a 10-digit number.", "danger")
+    return redirect(url_for('dashboard'))
+
 
 # CONTINUES BELOW ⬇️
 # ========== Auth & Registration ==========
@@ -406,13 +422,15 @@ def dashboard():
 
         flash("✅ Appointment booked successfully.")
         return redirect(url_for('dashboard'))
+    missing_phone = not current_user.phone
 
     return render_template(
         'dashboard.html',
         appointments=appointments,
         bath_types=bath_types,
         booked_slots=booked_slots,
-        current_date=date.today().isoformat()
+        current_date=date.today().isoformat(),
+        missing_phone=missing_phone 
     )
 
 @app.route('/make_member/<int:user_id>', methods=['GET','POST']) 
@@ -481,9 +499,31 @@ def whatsapp_booking():
     return render_template('whatsapp_booking.html', bath_types=bath_types)
 
 # ========== Continue? ==========
-# Next part: Admin panel, delete users, reschedule, init-db, etc.
+# Next part: Admin panel, delete users, reschedule, init-db, block etc.
 
 # ========== Appointment Rescheduling ==========
+
+@app.route('/admin/block_user/<int:user_id>', methods=['POST'])
+@login_required
+def block_user(user_id):
+    if not current_user.is_admin:
+        flash("Access denied", "danger")
+        return redirect(url_for('home'))
+
+    user = User.query.get_or_404(user_id)
+    user.is_blocked = not user.is_blocked
+    db.session.commit()
+    flash(f"User {user.email} has been {'blocked' if user.is_blocked else 'unblocked'}.", "info")
+    return redirect(url_for('admin_users'))
+
+@app.before_request
+def block_logged_in_users():
+    if current_user.is_authenticated and current_user.is_blocked:
+        logout_user()
+        flash("❌ Your account has been blocked.", "danger")
+        return redirect(url_for('login'))
+
+
 @app.route('/reschedule/<int:id>', methods=['GET', 'POST'])
 @login_required
 def reschedule_appointment(id):

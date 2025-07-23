@@ -2,20 +2,21 @@
 
 {% block title %}Admin - Users{% endblock %}
 
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_users.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container">
   {% with messages = get_flashed_messages() %}
     {% if messages %}
-      <div class="flash flash-success">
-        {{ messages[0] }}
-      </div>
+      <div class="flash flash-success">{{ messages[0] }}</div>
     {% endif %}
   {% endwith %}
 
   <h2>Manage Users</h2>
 
-  <!-- Filter Dropdown -->
-  <form method="GET" action="{{ url_for('admin_users') }}" style="margin-bottom: 20px;">
+  <form method="GET" action="{{ url_for('admin_users') }}" class="filter-form">
     <label>Filter by Membership:</label>
     <select name="filter" onchange="this.form.submit()">
       <option value="All" {% if current_filter == 'All' %}selected{% endif %}>All</option>
@@ -25,82 +26,72 @@
     </select>
   </form>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Admin?</th>
-        <th>Membership</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for user in users %}
-      <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.username }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.phone or '—' }}</td>
-        <td>
-          {% if user.is_admin %}
-            <span class="badge badge-yes">Yes</span>
-          {% else %}
-            <span class="badge badge-no">No</span>
-          {% endif %}
-        </td>
-        <td>
-          {% if user.membership_type %}
-            <span class="badge badge-{{ user.membership_type|lower }}">{{ user.membership_type }}</span>
-          {% else %}
-            <span class="badge badge-no">None</span>
-          {% endif %}
-        </td>
-        <td>
-          <!-- Membership Form -->
-          <form method="POST" style="display:inline-block;">
-            <input type="hidden" name="user_id" value="{{ user.id }}">
-            <select name="membership_type" onchange="this.form.submit()">
-              {% for level in membership_levels %}
-                <option value="{{ level }}" {% if user.membership_type == level or (not user.membership_type and level == 'None') %}selected{% endif %}>{{ level }}</option>
-              {% endfor %}
-            </select>
-          </form>
-
-          {% if not user.is_admin %}
-            <a href="{{ url_for('delete_user', id=user.id) }}" class="delete-link" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
-          {% else %}
-            <em class="protected">Protected</em>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Admin?</th>
+          <th>Membership</th>
+          <th>Blocked</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td data-label="ID">{{ user.id }}</td>
+          <td data-label="Name">{{ user.username }}</td>
+          <td data-label="Email">{{ user.email }}</td>
+          <td data-label="Phone">{{ user.phone or '—' }}</td>
+          <td data-label="Admin?">
+            <span class="badge {{ 'badge-yes' if user.is_admin else 'badge-no' }}">
+              {{ 'Yes' if user.is_admin else 'No' }}
+            </span>
+          </td>
+          <td data-label="Membership">
+            {% if user.membership_type %}
+              <span class="badge badge-{{ user.membership_type|lower }}">{{ user.membership_type }}</span>
+            {% else %}
+              <span class="badge badge-no">None</span>
+            {% endif %}
+          </td>
+          <td data-label="Blocked">
+            {% if not user.is_admin %}
+              <form method="POST" action="{{ url_for('block_user', user_id=user.id) }}">
+                <label class="switch">
+                  <input type="checkbox" name="is_blocked" onchange="this.form.submit()" {% if user.is_blocked %}checked{% endif %}>
+                  <span class="slider round"></span>
+                </label>
+              </form>
+            {% else %}
+              <em class="protected">—</em>
+            {% endif %}
+          </td>
+          <td data-label="Actions">
+            <form method="POST" style="display:inline;">
+              <input type="hidden" name="user_id" value="{{ user.id }}">
+              <select name="membership_type" onchange="this.form.submit()">
+                {% for level in membership_levels %}
+                  <option value="{{ level }}" {% if user.membership_type == level %}selected{% endif %}>{{ level }}</option>
+                {% endfor %}
+              </select>
+            </form>
+            {% if not user.is_admin %}
+              <a href="{{ url_for('delete_user', id=user.id) }}" class="delete-link" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
+            {% else %}
+              <em class="protected">Protected</em>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
   <a href="{{ url_for('admin') }}" class="btn">⬅ Back to Admin Dashboard</a>
 </div>
-
-<style>
-  .badge-gold {
-    background: gold;
-    color: black;
-    padding: 4px 8px;
-    border-radius: 4px;
-  }
-  .badge-platinum {
-    background: #e5e4e2;
-    color: #333;
-    padding: 4px 8px;
-    border-radius: 4px;
-  }
-  .badge-diamond {
-    background: #b9f2ff;
-    color: #0e3d5c;
-    padding: 4px 8px;
-    border-radius: 4px;
-  }
-</style>
 {% endblock %}

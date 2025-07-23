@@ -1,238 +1,212 @@
-/* admin_users.css */
-
-/* General Page Style */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f9ff;
-    margin: 0;
-    padding: 0;
-    color: #0C254C;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f9ff;
+  margin: 0;
+  padding: 0;
+  color: #0C254C;
 }
 
-/* Container */
 .container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 2rem;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Headings */
 h2 {
-    color: #003366;
-    margin-bottom: 20px;
-    font-size: 1.8rem;
+  color: #003366;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
 }
 
-/* Flash Messages */
 .flash {
-    padding: 12px 16px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    font-size: 0.95rem;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
 }
 
 .flash-success {
-    background-color: #e6ffed;
-    color: #267a38;
+  background-color: #e6ffed;
+  color: #267a38;
 }
 
 .flash-danger {
-    background-color: #ffe6e6;
-    color: #cc0000;
+  background-color: #ffe6e6;
+  color: #cc0000;
 }
 
-/* Table Styles */
+.filter-form {
+  margin-bottom: 20px;
+}
+
 table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 table th,
 table td {
-    padding: 14px 16px;
-    border: 1px solid #cce0f5;
-    text-align: left;
-    font-size: 0.95rem;
-    color: #0C254C;
+  padding: 14px 16px;
+  border: 1px solid #cce0f5;
+  text-align: left;
+  font-size: 0.95rem;
+  color: #0C254C;
 }
 
 table th {
-    background-color: #cce0f5;
-    color: #003366;
-    font-weight: 600;
+  background-color: #cce0f5;
+  color: #003366;
+  font-weight: 600;
 }
 
-table tr:nth-child(even) {
-    background-color: #f0f7ff;
-}
-
-table tr:hover {
-    background-color: #e6f2ff;
-}
-
-/* Badges */
 .badge {
-    display: inline-block;
-    padding: 4px 8px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    border-radius: 4px;
-    text-align: center;
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .badge-yes {
-    background-color: #d1f7e2;
-    color: #267a38;
+  background-color: #d1f7e2;
+  color: #267a38;
 }
 
 .badge-no {
-    background-color: #fbeaea;
-    color: #c0392b;
+  background-color: #fbeaea;
+  color: #c0392b;
 }
 
-/* Delete Link */
+.badge-gold {
+  background: gold;
+  color: black;
+}
+
+.badge-platinum {
+  background: #e5e4e2;
+  color: #333;
+}
+
+.badge-diamond {
+  background: #b9f2ff;
+  color: #0e3d5c;
+}
+
 .delete-link {
-    color: #e74c3c;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 4px 10px;
-    border: 1px solid #e74c3c;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 4px 10px;
+  border: 1px solid #e74c3c;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .delete-link:hover {
-    background-color: #e74c3c;
-    color: #fff;
+  background-color: #e74c3c;
+  color: #fff;
 }
 
-/* Protected Text */
-.protected {
-    color: gray;
-    font-style: italic;
-}
-
-/* Back Button */
 .btn {
-    display: inline-block;
-    background-color: #0077cc;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: background-color 0.2s ease;
+  display: inline-block;
+  background-color: #0077cc;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
 }
 
 .btn:hover {
-    background-color: #005fa3;
+  background-color: #005fa3;
 }
 
-/* Mobile Responsive Table */
-@media (max-width: 768px) {
-    table, thead, tbody, th, td, tr {
-        display: block;
-    }
-
-    table tr {
-        margin-bottom: 1rem;
-    }
-
-    table td {
-        padding-left: 50%;
-        position: relative;
-    }
-
-    table td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 16px;
-        top: 12px;
-        font-weight: bold;
-        color: #003366;
-    }
-
-    table th {
-        display: none;
-    }
+.protected {
+  color: gray;
+  font-style: italic;
 }
 
-/* === Admin Navbar === */
-.admin-navbar {
-  background-color: #003366;
-  padding: 1rem;
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
 }
 
-.navbar-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
-.header-logo {
-  height: 40px;
-}
-
-.nav-links {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  padding: 8px 12px;
-  font-weight: bold;
-  border-radius: 4px;
-}
-
-.nav-links a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.burger {
-  display: none;
-  font-size: 1.8rem;
-  background: none;
-  border: none;
-  color: white;
+.slider {
+  position: absolute;
   cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.2s;
+  border-radius: 34px;
 }
 
-/* 📱 Responsive Admin Navbar */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.2s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #28a745;
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* 📱 Responsive Table */
 @media (max-width: 768px) {
-  .burger {
+  table, thead, tbody, th, td, tr {
     display: block;
   }
 
-  .nav-links {
+  thead {
     display: none;
-    flex-direction: column;
-    width: 100%;
-    background-color: #003366;
-    margin-top: 10px;
   }
 
-  .nav-links.show {
-    display: flex;
+  tr {
+    margin-bottom: 1rem;
   }
 
-  .nav-links a {
-    padding: 12px 20px;
-    width: 100%;
+  td {
+    position: relative;
+    padding-left: 50%;
+    border: 1px solid #cce0f5;
+  }
+
+  td::before {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    width: 45%;
+    white-space: nowrap;
+    font-weight: bold;
+    color: #003366;
+    content: attr(data-label);
   }
 }
