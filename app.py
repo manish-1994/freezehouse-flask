@@ -437,6 +437,25 @@ def dashboard():
         missing_phone=missing_phone 
     )
 
+@app.route('/complete-profile', methods=['GET', 'POST'])
+@login_required
+def complete_profile():
+    if current_user.phone:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        phone = request.form.get('phone')
+        if phone:
+            current_user.phone = phone
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Please enter a valid phone number.', 'danger')
+
+    return render_template('complete_profile.html')
+
+
 @app.route('/make_member/<int:user_id>', methods=['GET','POST']) 
 @login_required
 def make_member(user_id):
