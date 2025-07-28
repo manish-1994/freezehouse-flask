@@ -10,24 +10,26 @@
     <div class="welcome-section">
       <h1> Welcome, <span class="user-name">{{ current_user.username }}</span></h1>
 
-      {% if current_user.membership_type %}
-      <div class="badge-section">
-        <img src="{{ url_for('static', filename='img/member.jpg') }}" alt="Member Badge" class="profile-image">
-        <p class="membership-line">
-          You are a 
-          {% if current_user.membership_type == 'Diamond' %}
-            <strong style="color: darkblue;">💎 Diamond Member</strong>
-          {% elif current_user.membership_type == 'Platinum' %}
-            <strong style="color: teal;">🏆 Platinum Member</strong>
-          {% elif current_user.membership_type == 'Gold' %}
-            <strong style="color: goldenrod;">🥇 Gold Member</strong>
-          {% else %}
-            <strong>{{ current_user.membership_type }} Member</strong>
-          {% endif %}
-        </p>
-      </div>
+  <div class="badge-section">
+  <img src="{{ url_for('static', filename='img/member.jpg') }}" alt="Member Badge" class="profile-image">
+  <p class="membership-line">
+    {% if current_user.membership_type %}
+      You are a 
+      {% if current_user.membership_type == 'Diamond' %}
+        <strong style="color: darkblue;">💎 Diamond Member</strong>
+      {% elif current_user.membership_type == 'Platinum' %}
+        <strong style="color: teal;">🏆 Platinum Member</strong>
+      {% elif current_user.membership_type == 'Gold' %}
+        <strong style="color: goldenrod;">🥇 Gold Member</strong>
+      {% else %}
+        <strong>{{ current_user.membership_type }} Member</strong>
       {% endif %}
-    </div>
+    {% else %}
+      <strong style="color: red;">Not a Member</strong>
+    {% endif %}
+  </p>
+</div>
+
 
     <!-- Phone Modal -->
     {% if missing_phone %}
