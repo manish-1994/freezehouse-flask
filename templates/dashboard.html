@@ -5,7 +5,7 @@
 {% block content %}
 <div id="particles-js"></div>
 <div class="dashboard">
-  
+
     <!-- Welcome Section -->
     <div class="welcome-section">
       <h1> Welcome, <span class="user-name">{{ current_user.username }}</span></h1>
@@ -27,14 +27,28 @@
         </p>
       </div>
       {% endif %}
-
-      {% if missing_phone %}
-      <div class="alert alert-warning mt-3">
-        📱 <strong>Update Required:</strong> Please <a href="{{ url_for('profile') }}">add your phone number</a> to complete your profile.
-      </div>
-      {% endif %}
-
     </div>
+
+    <!-- Phone Modal -->
+    {% if missing_phone %}
+    <div class="modal fade" id="phoneModal" tabindex="-1" aria-labelledby="phoneModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('add_phone') }}">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="phoneModalLabel">📱 Add Your Phone Number</h5>
+            </div>
+            <div class="modal-body">
+              <input type="text" name="phone" class="form-control" placeholder="Enter 10-digit phone number" required pattern="^\d{10}$">
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Save Phone</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
 
     <!-- Booking Form -->
     <div class="card booking-card">
@@ -116,13 +130,16 @@
     <div class="logout-link">
       <a href="{{ url_for('logout') }}" class="btn btn-danger">🚪 Logout</a>
     </div>
-  
+
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script src="{{ url_for('static', filename='js/particles-config.js') }}"></script>
+
+<!-- Bootstrap modal trigger for phone -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   const bookedSlots = {{ booked_slots | tojson | safe }};
   const timeSelect = document.getElementById("time");
@@ -148,5 +165,10 @@
       }
     });
   });
+
+  {% if missing_phone %}
+  const phoneModal = new bootstrap.Modal(document.getElementById('phoneModal'));
+  phoneModal.show();
+  {% endif %}
 </script>
 {% endblock %}

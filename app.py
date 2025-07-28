@@ -277,6 +277,8 @@ def login():
         flash("Invalid credentials.")
     return render_template('login.html')
 
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -357,6 +359,8 @@ def contact(): return render_template('contact.html')
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    if not current_user.phone:
+        return redirect(url_for('complete_profile')) # Redirect if phone not set
     from datetime import date
 
     bath_types = BathType.query.all()
