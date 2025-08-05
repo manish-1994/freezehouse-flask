@@ -10,10 +10,10 @@
     <div class="welcome-section">
       <h1> Welcome, <span class="user-name">{{ current_user.username }}</span></h1>
 
+  {% if current_user.is_member and current_user.membership_type %}
   <div class="badge-section">
-  <img src="{{ url_for('static', filename='img/member.jpg') }}" alt="Member Badge" class="profile-image">
-  <p class="membership-line">
-    {% if current_user.membership_type %}
+    <img src="{{ url_for('static', filename='img/member.jpg') }}" alt="Member Badge" class="profile-image">
+    <p class="membership-line">
       You are a 
       {% if current_user.membership_type == 'Diamond' %}
         <strong style="color: darkblue;">💎 Diamond Member</strong>
@@ -24,11 +24,9 @@
       {% else %}
         <strong>{{ current_user.membership_type }} Member</strong>
       {% endif %}
-    {% else %}
-      <strong style="color: red;">Not a Member</strong>
-    {% endif %}
-  </p>
-</div>
+    </p>
+  </div>
+{% endif %}
 
 
     <!-- Phone Modal -->
