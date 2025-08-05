@@ -5,26 +5,17 @@
 
 {% block content %}
   <h1 class="section-heading">Benefits of Ice Bath Therapy</h1>
-  <ul class="card-list">
-    <li class="card">
-      <h3>🦵 Reduces Muscle Soreness</h3>
-      <p>Cold exposure reduces inflammation and relieves sore muscles post workout or intense activity.</p>
-    </li>
-    <li class="card">
-      <h3>💪 Accelerates Recovery</h3>
-      <p>Ice baths help your body bounce back faster after physical exertion by increasing blood flow and nutrient delivery.</p>
-    </li>
-    <li class="card">
-      <h3>🧠 Enhances Mental Clarity</h3>
-      <p>Cold therapy can elevate mood, improve alertness, and boost resilience to stress.</p>
-    </li>
-    <li class="card">
-      <h3>💤 Improves Sleep</h3>
-      <p>Lowering your body temperature before sleep may help you relax and fall asleep faster.</p>
-    </li>
-    <li class="card">
-      <h3>🔥 Boosts Immunity</h3>
-      <p>Regular exposure to cold is linked with increased white blood cell count and immunity support.</p>
-    </li>
-  </ul>
+
+  {% if benefits %}
+    <ul class="card-list">
+      {% for benefit in benefits %}
+        <li class="card">
+          <h3>{{ benefit.title }}</h3>
+          <p>{{ benefit.description }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No benefits available yet. Please check back later.</p>
+  {% endif %}
 {% endblock %}
