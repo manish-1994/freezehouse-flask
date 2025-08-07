@@ -38,6 +38,7 @@
           <th>Phone</th>
           <th>Admin?</th>
           <th>Membership</th>
+          <th>Sessions</th> <!-- ✅ New column -->
           <th>Blocked</th>
           <th>Actions</th>
         </tr>
@@ -60,6 +61,24 @@
               <span class="badge badge-{{ display_type|lower }}">{{ display_type }}</span>
             {% endif %}
           </td>
+
+          <!-- ✅ Session breakdown column -->
+          <td data-label="Sessions">
+            {% set session_counts = {} %}
+            {% for appt in user.bookings %}
+              {% set session_counts = session_counts.update({appt.bath_type: (session_counts.get(appt.bath_type, 0) + 1)}) or session_counts %}
+            {% endfor %}
+            {% if session_counts %}
+              <ul style="margin: 0; padding-left: 1em;">
+                {% for type, count in session_counts.items() %}
+                  <li>{{ type }}: {{ count }} time{{ 's' if count > 1 else '' }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <em>—</em>
+            {% endif %}
+          </td>
+
           <td data-label="Blocked">
             {% if not user.is_admin %}
               <form method="POST" action="{{ url_for('block_user', user_id=user.id) }}">
@@ -72,6 +91,7 @@
               <em class="protected">—</em>
             {% endif %}
           </td>
+
           <td data-label="Actions">
             <div class="actions-cell">
               <form method="POST" action="{{ url_for('admin_users') }}">
