@@ -160,3 +160,16 @@ input:checked + .slider:before {
     width: 100%;
   }
 }
+
+.btn-sm {
+  font-size: 0.8em;
+  padding: 4px 8px;
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
