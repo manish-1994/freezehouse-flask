@@ -79,9 +79,6 @@ class User(db.Model, UserMixin):
     is_blocked = db.Column(db.Boolean, default=False)
 
 
-
-
-
 class OTPStore(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), nullable=False)
@@ -660,6 +657,21 @@ def admin_add_reschedule(appointment_id):
     db.session.commit()
     flash("➕ Extra reschedule granted for this appointment.", "success")
     return redirect(url_for('admin'))
+
+# Reset all sessions for a user
+@app.route('/admin/reset_sessions/<int:user_id>', methods=['POST'])
+@login_required
+def reset_sessions(user_id):
+    if not current_user.is_admin:
+        flash("Unauthorized", "danger")
+        return redirect(url_for('admin_users'))
+
+    user = User.query.get_or_404(user_id)
+    deleted_count = Appointment.query.filter_by(user_id=user.id).delete()
+    db.session.commit()
+
+    flash(f"✅ {deleted_count} sessions reset for {user.username}.", "success")
+    return redirect(url_for('admin_users'))
 
 
 # ========== Admin User Management ==========
