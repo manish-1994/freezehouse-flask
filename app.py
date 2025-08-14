@@ -43,7 +43,6 @@ login_manager.login_view = 'login'
 
 
 
-
 # ========== Telegram Setup ==========
 BOT_TOKEN = app.config['TELEGRAM_BOT_TOKEN']
 ADMIN_CHAT_IDS = app.config['TELEGRAM_CHAT_IDS']
@@ -162,6 +161,12 @@ def format_12hr(time_str):
         return datetime.strptime(time_str, '%H:%M').strftime('%I:%M %p')
     except Exception:
         return time_str
+
+
+@app.route("/healthz", methods=["GET"])
+def healthz():
+    # This should be as lightweight as possible.
+    return {"status": "ok"}, 200
 
 @app.route("/test-telegram")
 def test_telegram():
