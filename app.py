@@ -16,6 +16,9 @@ from config import Config,supabase
 import logging
 from threading import Thread, Event
 from sqlalchemy import text  # for a tiny DB ping
+from flask import g
+from sqlalchemy import text
+
 
 
 
@@ -45,50 +48,50 @@ login_manager.login_view = 'login'
 
 
 # ===== Cold-start readiness (Render) =====
+# Global flags
 APP_READY = Event()
+DB_OK = False
+
 
 def background_warmup():
-    app.logger.info("🔥 Warm-up started")
+    global DB_OK
     try:
-        with app.app_context():
+        with app.app_context():  # ✅ Required inside worker
+            # Try lightweight DB ping
             try:
                 db.session.execute(text("SELECT 1"))
-                app.logger.info("✅ DB ping success")
+                DB_OK = True
+                print("✅ DB ping success")
             except Exception as e:
-                app.logger.warning(f"⚠️ DB ping failed (non-blocking): {e}")
+                DB_OK = False
+                print(f"⚠️ DB ping failed: {e}")
 
-        # Optional: short delay so spinner is visible in dev
-        import time; time.sleep(3)
-
-    finally:
-        # Always mark app as ready
-        APP_READY.set()
-        app.logger.info("✅ Warm-up complete (app marked ready)")
-
-    app.logger.info("🔥 Warm-up started")
-    try:
-        with app.app_context():
-            try:
-                db.session.execute(text("SELECT 1"))
-                app.logger.info("✅ DB ping success")
-            except Exception as e:
-                app.logger.warning(f"⚠️ DB ping failed: {e}")
-
-        import time; time.sleep(5)
+            # Simulate extra init work if needed
+            import time; time.sleep(3)
 
     finally:
         APP_READY.set()
-        app.logger.info("✅ Warm-up complete")
+        print("✅ Warm-up complete")
 
 
-# ✅ Start only in the main process (prevents duplicate thread in debug reloader)
-if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    Thread(target=background_warmup, daemon=True).start()
+@app.before_request
+def ensure_warmup():
+    """
+    Ensures each Gunicorn worker starts its own warm-up thread.
+    This avoids the stuck 'loading...' issue on Render.
+    """
+    if not getattr(g, "_warmup_started", False):
+        g._warmup_started = True
+        Thread(target=background_warmup, daemon=True).start()
+        print("🔥 Warm-up started")
 
 
 @app.route("/healthz")
 def healthz():
-    return {"ready": APP_READY.is_set()}, 200
+    return {
+        "ready": APP_READY.is_set(),
+        "db_ok": DB_OK
+    }, 200
 
 
 
