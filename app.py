@@ -48,22 +48,38 @@ login_manager.login_view = 'login'
 APP_READY = Event()
 
 def background_warmup():
-    print("🔥 Warm-up started")
+    app.logger.info("🔥 Warm-up started")
     try:
-        # lightweight DB ping inside app context
         with app.app_context():
             try:
                 db.session.execute(text("SELECT 1"))
-                print("✅ DB ping success")
+                app.logger.info("✅ DB ping success")
             except Exception as e:
-                print(f"⚠️ DB ping failed: {e}")
+                app.logger.warning(f"⚠️ DB ping failed (non-blocking): {e}")
 
-        # simulate heavy init (so spinner shows)
+        # Optional: short delay so spinner is visible in dev
+        import time; time.sleep(3)
+
+    finally:
+        # Always mark app as ready
+        APP_READY.set()
+        app.logger.info("✅ Warm-up complete (app marked ready)")
+
+    app.logger.info("🔥 Warm-up started")
+    try:
+        with app.app_context():
+            try:
+                db.session.execute(text("SELECT 1"))
+                app.logger.info("✅ DB ping success")
+            except Exception as e:
+                app.logger.warning(f"⚠️ DB ping failed: {e}")
+
         import time; time.sleep(5)
 
     finally:
         APP_READY.set()
-        print("✅ Warm-up complete")
+        app.logger.info("✅ Warm-up complete")
+
 
 # ✅ Start only in the main process (prevents duplicate thread in debug reloader)
 if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
