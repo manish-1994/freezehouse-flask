@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Freezehouse is starting…</title>
+  <meta name="color-scheme" content="light" />
+  <style>
+    :root{
+      /* Freezehouse palette */
+      --bg: #0b1221;           /* deep navy */
+      --card: #0f1a33;         /* slightly lighter */
+      --ink: #e6f0ff;          /* ice white */
+      --ink-dim: #bfd3ff;      /* soft ice */
+      --accent: #79b6ff;       /* cold blue */
+      --accent-2: #a7d6ff;     /* lighter blue */
+      --ring: rgba(255,255,255,0.16);
+      --border: rgba(255,255,255,0.10);
+      --glow: 0 10px 40px rgba(0,0,0,0.35);
+      --radius: 22px;
+    }
+
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--ink);
+      background: radial-gradient(1200px 900px at 20% 10%, #0d1830 0%, var(--bg) 60%) no-repeat,
+                  linear-gradient(180deg, #0c162b 0%, var(--bg) 40%) no-repeat;
+      display: grid; place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%; max-width: 560px;
+      background: color-mix(in oklab, var(--card) 88%, #000 12%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--glow);
+      position: relative;
+      overflow: clip;
+      isolation: isolate;
+    }
+
+    /* faint sheen top edge */
+    .card::before{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent 28%);
+      mix-blend-mode: screen;
+    }
+
+    .brand {
+      display:flex; align-items:center; justify-content:center; gap:14px;
+      margin-bottom: 6px;
+    }
+    .brand h1 {
+      font-size: 1.15rem; letter-spacing: .02em; margin:0;
+      font-weight: 600; color: var(--ink);
+    }
+    .brand small { display:block; font-size:.85rem; color: var(--ink-dim); margin-top: 2px; }
+
+    /* --- Spinner with logo --- */
+    .spinner-wrap{
+      width: 124px; height: 124px; margin: 10px auto 8px; position: relative;
+      display:grid; place-items:center;
+      filter: drop-shadow(0 6px 22px rgba(121,182,255,.25));
+    }
+    .ring{
+      position:absolute; inset:0; border-radius:50%;
+      background:
+        conic-gradient(from 0deg,
+          color-mix(in oklab, var(--accent) 80%, white 20%) 0 25%,
+          color-mix(in oklab, var(--accent-2) 80%, white 10%) 0 60%,
+          transparent 60% 100%);
+      -webkit-mask:
+        radial-gradient(farthest-side, transparent 64%, #000 66%),
+        radial-gradient(farthest-side, #000 64%, transparent 66%);
+      mask:
+        radial-gradient(farthest-side, transparent 64%, #000 66%),
+        radial-gradient(farthest-side, #000 64%, transparent 66%);
+      animation: spin 1.2s linear infinite;
+    }
+    .ring::after{
+      /* static inner ring for quality feel */
+      content:""; position:absolute; inset:8px; border-radius:50%;
+      border: 1px solid var(--ring);
+    }
+    .logo{
+      width: 82px; height: 82px; border-radius: 18px;
+      background: #0b162c url('{{ url_for("static", filename="img/logo.png") }}') center/96% no-repeat;
+      border: 1px solid var(--border);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 10px 30px rgba(0,0,0,.35);
+      animation: breathe 2.2s ease-in-out infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes breathe {
+      0%, 100% { transform: translateZ(0) scale(1); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,.35); }
+      50% { transform: translateZ(0) scale(1.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 14px 36px rgba(0,0,0,.45); }
+    }
+
+    /* Frost particles */
+    .flakes { position: absolute; inset: 0; pointer-events:none; overflow:hidden; }
+    .flake {
+      --x: 50%;
+      position:absolute; top:-10px; left: var(--x);
+      width: 3px; height: 8px; border-radius: 2px;
+      background: color-mix(in oklab, var(--ink) 78%, transparent 22%);
+      opacity: .35; filter: blur(.2px);
+      animation: fall var(--d,5s) linear infinite;
+    }
+    @keyframes fall {
+      to { transform: translate3d(0, 120vh, 0) rotate(12deg); }
+    }
+
+    .status { text-align:center; margin: 12px 0 0; color: var(--ink-dim); font-size: .98rem; }
+    .dots::after { content:''; animation: dots 1.2s steps(4, end) infinite; }
+    @keyframes dots { 0%,20%{content:'';} 40%{content:'.';} 60%{content:'..';} 80%,100%{content:'...';} }
+
+    .tip {
+      text-align:center; margin-top: 10px; font-size: .86rem;
+      color: color-mix(in oklab, var(--ink) 70%, transparent 30%);
+    }
+
+    .bar {
+      height: 3px; width: 100%;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px; overflow: hidden; margin: 16px 0 2px;
+    }
+    .bar > i {
+      display:block; height:100%; width: 32%;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+      border-radius:999px;
+      animation: slide 1.4s ease-in-out infinite;
+    }
+    @keyframes slide {
+      0%   { transform: translateX(-60%); }
+      50%  { transform: translateX(130%); }
+      100% { transform: translateX(300%); }
+    }
+
+    .actions { text-align:center; margin-top: 10px; }
+    .btn {
+      display:inline-block; padding: 8px 14px; border-radius: 10px;
+      border: 1px solid var(--border); color: var(--ink); text-decoration: none;
+    }
+
+    /* Reduced motion accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      .ring, .logo, .flake, .dots::after, .bar > i { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card" role="status" aria-live="polite" aria-label="Freezehouse is starting">
+    <div class="brand">
+      <h1>Freezehouse Berhampur</h1>
+    </div>
+
+    <div class="spinner-wrap" aria-hidden="true">
+      <div class="ring"></div>
+      <div class="logo"></div>
+    </div>
+
+    <div class="bar" aria-hidden="true"><i></i></div>
+
+    <p class="status">
+      <span class="dots">Starting server</span> — cold starts on free tiers can take a short moment.
+    </p>
+    <p class="tip">We’ll take you to the site automatically once it’s ready.</p>
+
+    <div class="actions">
+      <a class="btn" href="#" id="retryBtn" aria-label="Retry loading">Retry</a>
+    </div>
+
+    <!-- subtle frost particles -->
+    <div class="flakes" aria-hidden="true">
+      <!-- 16 lightweight flakes; randomize with CSS vars -->
+      <div class="flake" style="--x:10%; --d:6.2s"></div>
+      <div class="flake" style="--x:18%; --d:5.5s"></div>
+      <div class="flake" style="--x:26%; --d:7.0s"></div>
+      <div class="flake" style="--x:34%; --d:6.0s"></div>
+      <div class="flake" style="--x:42%; --d:5.0s"></div>
+      <div class="flake" style="--x:50%; --d:7.4s"></div>
+      <div class="flake" style="--x:58%; --d:5.8s"></div>
+      <div class="flake" style="--x:66%; --d:6.6s"></div>
+      <div class="flake" style="--x:74%; --d:5.2s"></div>
+      <div class="flake" style="--x:82%; --d:7.6s"></div>
+      <div class="flake" style="--x:90%; --d:6.3s"></div>
+      <div class="flake" style="--x:15%; --d:6.9s"></div>
+      <div class="flake" style="--x:29%; --d:5.6s"></div>
+      <div class="flake" style="--x:61%; --d:6.7s"></div>
+      <div class="flake" style="--x:73%; --d:5.9s"></div>
+      <div class="flake" style="--x:87%; --d:6.1s"></div>
+    </div>
+  </main>
+
+  <script>
+    // Poll /healthz until ready, then go to the real home page.
+    const CHECK_EVERY_MS = 1400;
+    const TIMEOUT_MS = 120000; // 2 minutes
+
+    const start = Date.now();
+    async function poll () {
+      try {
+        const res = await fetch("/healthz", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.ready) {
+            window.location.replace("/");
+            return;
+          }
+        }
+      } catch (_e) { /* ignore on cold boot */ }
+
+      if (Date.now() - start < TIMEOUT_MS) {
+        setTimeout(poll, CHECK_EVERY_MS);
+      } else {
+        const s = document.querySelector(".status");
+        if (s) s.textContent = "Still starting… server may be waking up. You can retry.";
+      }
+    }
+
+    document.getElementById("retryBtn")?.addEventListener("click", (e)=>{
+      e.preventDefault();
+      window.location.reload();
+    });
+
+    poll();
+  </script>
+</body>
+</html>

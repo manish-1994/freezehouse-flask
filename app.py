@@ -14,6 +14,8 @@ import io
 import pandas as pd
 from config import Config,supabase
 import logging
+from threading import Thread, Event
+from sqlalchemy import text  # for a tiny DB ping
 
 
 
@@ -40,6 +42,33 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+
+# ===== Cold-start readiness (Render) =====
+APP_READY = Event()
+
+def background_warmup():
+    try:
+        # lightweight DB ping
+        try:
+            db.session.execute(text("SELECT 1"))
+        except Exception:
+            pass
+
+        # simulate heavy init so you can see spinner locally
+        import time; time.sleep(5)
+
+    finally:
+        APP_READY.set()
+
+# ✅ Kick off warmup thread immediately
+Thread(target=background_warmup, daemon=True).start()
+
+@app.route("/healthz")
+def healthz():
+    return {"ready": APP_READY.is_set()}, 200
+
+
 
 
 
@@ -163,10 +192,7 @@ def format_12hr(time_str):
         return time_str
 
 
-@app.route("/healthz", methods=["GET"])
-def healthz():
-    # This should be as lightweight as possible.
-    return {"status": "ok"}, 200
+
 
 @app.route("/test-telegram")
 def test_telegram():
@@ -340,8 +366,11 @@ def reset_password():
     return render_template('reset_password.html')
 
 # ========== General Pages ==========
-@app.route('/')
-def home(): return render_template('index.html')
+@app.route("/")
+def home():
+    if not APP_READY.is_set():
+        return render_template("loading.html")
+    return render_template("index.html")
 
 @app.route('/about')
 def about(): return render_template('about.html')
