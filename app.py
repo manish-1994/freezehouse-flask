@@ -48,21 +48,27 @@ login_manager.login_view = 'login'
 APP_READY = Event()
 
 def background_warmup():
+    print("🔥 Warm-up started")
     try:
-        # lightweight DB ping
-        try:
-            db.session.execute(text("SELECT 1"))
-        except Exception:
-            pass
+        # lightweight DB ping inside app context
+        with app.app_context():
+            try:
+                db.session.execute(text("SELECT 1"))
+                print("✅ DB ping success")
+            except Exception as e:
+                print(f"⚠️ DB ping failed: {e}")
 
-        # simulate heavy init so you can see spinner locally
+        # simulate heavy init (so spinner shows)
         import time; time.sleep(5)
 
     finally:
         APP_READY.set()
+        print("✅ Warm-up complete")
 
-# ✅ Kick off warmup thread immediately
-Thread(target=background_warmup, daemon=True).start()
+# ✅ Start only in the main process (prevents duplicate thread in debug reloader)
+if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+    Thread(target=background_warmup, daemon=True).start()
+
 
 @app.route("/healthz")
 def healthz():
